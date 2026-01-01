@@ -1,0 +1,48 @@
+@import "styles.scss";
+
+.prompt-container {
+    border:0px solid gray;
+    height:100%;
+}
+
+.prompt-container .header {
+    background-color: #EEE;
+    padding:10px;
+    margin-bottom: 20px;
+}
+
+.prompt-container .button-region {
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+}
+
+.prompt-container .button {
+  flex: 1;
+  height: 80px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid #DDD;
+  margin-right:10px;
+}
+
+.prompt-container .button-border-right {
+  border-right: 1px solid #DDD;
+}
+
+.prompt-container .button:hover {
+  background-color: #DDD;
+}
+
+.prompt-container .button:active {
+  background-color: $primary;
+}
+
+.prompt-container .button .text {
+  display: flex;
+  justify-content: center; /* horizontal */
+  align-items: center;     /* vertical */
+  height: 100%;            /* ensure it takes full height */
+  width: 100%;
+  text-align: center;
+}

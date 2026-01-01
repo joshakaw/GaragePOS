@@ -1,0 +1,68 @@
+@import "styles.scss";
+
+
+$numpadWidth: 400px;
+// Numpad grid container
+.prompt-container .numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px;        // matches other padding in prompt
+  margin-left: 10px;
+  margin-right:10px;
+  width:$numpadWidth;
+}
+
+/* Use a separate button class so we don't conflict with .button's margin-right */
+.prompt-container .numpad-button {
+  height: 80px;                 // match your .button height
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid #DDD;
+//   border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* do not include margin-right here — grid gap handles spacing */
+}
+
+/* blank placeholder (bottom-right) */
+.prompt-container .numpad-blank {
+  height: 80px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  pointer-events: none; /* inert */
+}
+
+/* hover / active states to match your existing .button styles */
+.prompt-container .numpad-button:hover {
+  background-color: #DDD;
+}
+.prompt-container .numpad-button:active {
+  background-color: $primary; /* your existing variable */
+}
+
+/* text alignment identical to other buttons */
+.prompt-container .numpad-button .text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.prompt-container .numpad-display {
+  border: 1px solid #DDD;
+  margin: 10px;
+  padding: 10px;
+  font-size: 1.5em;
+  text-align: right;
+  background-color: #f9f9f9;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width:$numpadWidth;
+}

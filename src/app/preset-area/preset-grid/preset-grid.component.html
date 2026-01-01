@@ -1,0 +1,10 @@
+<div class="grid-container">
+  <!-- <app-preset-grid-button *ngFor="let item of gridItems" ></app-preset-grid-button> -->
+  <div class="app-preset-grid-button" *ngFor="let item of gridItems" (click)="handleGridItemClick(item)">
+    @if (item.Label != "<BLANK>") {
+      <div class="text">
+        {{item.Label}}
+      </div>
+      }
+  </div>
+</div>

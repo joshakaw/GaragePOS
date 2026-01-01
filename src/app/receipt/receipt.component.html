@@ -1,0 +1,64 @@
+<div class="app-receipt">
+  <div class="info-area pad-left pad-right">
+    {{transactionReferenceNumber ? "#" + transactionReferenceNumber : "No Ref"}}
+  </div>
+  <div class="receipt-area">
+    <div #highlightBar class="highlight-bar"></div>
+    <table class="receipt-table">
+      <colgroup>
+        <col style="width: 50px" />
+        <col style="width: auto" />
+        <col style="width: 10px" />
+      </colgroup>
+
+      <!-- <thead>
+                <tr>
+                    <td>
+                        Quantity
+                    </td>
+                    <td>
+                        Name
+                    </td>
+                    <td>
+                        Price
+                    </td>
+                </tr>
+            </thead> -->
+      <tbody>
+        <tr
+          *ngFor="let receiptItem of receiptItemList; let i = index"
+          [ngClass]="{ selected: i == selectedItemIndex }"
+          (click)="onClickItem(i)"
+        >
+          <td class="pad-left row-height">
+            {{  receiptItem.quantity }}
+          </td>
+          <td>
+            {{ receiptItem.name }}
+          </td>
+          <td style="text-align: right" class="pad-right">
+            {{ receiptItem.displayTotal }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  @if(changeAmount() != null) {
+  <div>Subtotal: {{displaySubtotal}}</div>
+  <div class="summary-area pad">
+    <div>Change</div>
+    <div style="text-align: right">
+      {{ changeAmount() }}
+    </div>
+  </div>
+  } @else {
+  <div>Subtotal: {{displaySubtotal}}</div>
+  <div class="summary-area pad">
+    <div>Balance</div>
+    <div style="text-align: right">
+      {{ displaySubtotal }}
+    </div>
+  </div>
+  }
+
+</div>

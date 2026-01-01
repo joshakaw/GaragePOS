@@ -1,0 +1,182 @@
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { DbService } from '../core/services/db/db.service';
+import { DbGridMenuButton, ReservedGridMenuButtonLabel } from '../models/db/product';
+import { CommonModule } from '@angular/common';
+import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { NGXLogger } from 'ngx-logger';
+
+// TODO: This logic mirrors the PresetGridComponent very much. 
+// Add onclick event listeners to PresetGridComponent to allow this to utilize the
+// same logic (DRY)
+
+@Component({
+  selector: 'app-configure',
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './configure.component.html',
+  styleUrl: './configure.component.scss',
+})
+export class ConfigureComponent implements OnInit {
+  width: number = 7;
+  height: number = 5;
+  gridItems: Array<DbGridMenuButton> = Array(this.width * this.height);
+
+  protected selectedGridMenuId: number = 1; // 1=Main menu by default
+
+  form!: FormGroup;
+
+  constructor(
+    private _router: Router,
+    private _dbService: DbService,
+    private logger: NGXLogger
+  ) {
+    this.form = new FormGroup({
+      gridMenuButtonId: new FormControl(''),
+      label: new FormControl(''),
+      productId: new FormControl(''),
+      defaultQuantity: new FormControl('1'),
+      x: new FormControl('1'),
+      y: new FormControl('1'),
+    });
+  }
+
+  ngOnInit(): void {
+    this.refreshGridItems();
+
+    // Disable gridMenuButtonId
+    this.form.controls['gridMenuButtonId'].disable();
+    this.form.controls['defaultQuantity'].disable();
+    this.form.controls['x'].disable();
+    this.form.controls['y'].disable();
+  }
+
+  refreshGridItems(): void {
+    this.gridItems = this.createBlankGridItemArray(7, 5);
+    // Get menu
+    let dbGrid = this._dbService.getGridItems(this.selectedGridMenuId);
+
+    // Populate the grid from DB.
+    for (let i = 0; i < this.gridItems.length; i++) {
+      let pos: { x: number; y: number } = this.getXYFromIndex(i);
+      let gridItem = dbGrid.find((obj) => obj.X == pos.x && obj.Y == pos.y);
+      if (typeof gridItem != 'undefined') {
+        this.gridItems[i] = gridItem;
+      } else {
+        continue;
+      }
+    }
+
+    this.logger.info('Grid items refreshed.');
+  }
+
+  /**
+   * Creates an initial blank grid item array
+   * @param width X Size
+   * @param height Y Size
+   */
+  private createBlankGridItemArray(width: number, height: number) {
+    let tempGridItemsArray: DbGridMenuButton[] = [];
+    for (let y = 1; y <= height; y++) {
+      for (let x = 1; x <= width; x++) {
+        let a: DbGridMenuButton = {
+          X: x,
+          Y: y,
+          GridMenuButtonID: -1, // Unknown ID
+          GridMenuID: this.selectedGridMenuId,
+          ImageID: null,
+          Label: ReservedGridMenuButtonLabel.Invisible,
+          W: 1,
+          H: 1,
+          OnClick_Script: '',
+          OnClick_OpenGridMenuID: null,
+          OnClick_AddProductID: null,
+        };
+        tempGridItemsArray.push(a);
+      }
+    }
+
+    return tempGridItemsArray;
+  }
+
+  /**
+   * Action when a grid item is clicked.
+   * Patch grid item values into associated child form.
+   * @param item Grid menu button that was clicked.
+   * @param index The index of the grid item
+   */
+  onClickGridItem(item: DbGridMenuButton | null, index: number) {
+    let coords = this.getXYFromIndex(index);
+
+    this.form.patchValue({
+      gridMenuButtonId: item?.GridMenuButtonID,
+      label: item?.Label,
+      productId: item?.OnClick_AddProductID,
+      x: coords.x,
+      y: coords.y,
+    });
+  }
+
+  /**
+   * Calculates the X,Y coordinates based off of the
+   * current grid size.
+   * @param index  Index of the grid item
+   * @returns X, Y coordinates (1-based) of grid items
+   */
+  private getXYFromIndex(index: number): { x: number; y: number } {
+    let x = (index % this.width) + 1;
+    let y = Math.floor(index / this.width) + 1;
+    return { x, y };
+  }
+
+  /**
+   * On submitting the tile edit modal.
+   */
+  onSubmit() {
+    let gridMenuButtonId = this.form.controls['gridMenuButtonId'].value;
+    let label = this.form.controls['label'].value;
+    let productId = this.form.controls['productId'].value;
+    let defaultQuantity = this.form.controls['defaultQuantity'].value;
+    let x = this.form.controls['x'].value;
+    let y = this.form.controls['y'].value;
+
+    // Create the grid menu button if it doesn't exist
+    if (gridMenuButtonId == -1) {
+      try {
+        this._dbService.createGridMenuButton({
+          GridMenuButtonID: -1,
+          GridMenuID: this.selectedGridMenuId,
+          ImageID: null,
+          Label: label,
+          X: x,
+          Y: y,
+          W: 1,
+          H: 1,
+          OnClick_Script: '',
+          OnClick_OpenGridMenuID: null,
+          OnClick_AddProductID: productId,
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          alert('Could not create grid item due to a conflict.');
+        }
+      }
+
+      return;
+    }
+
+    // If it does exist, update it.
+    let obj = {
+      label: label,
+      productId: productId,
+      defaultQuantity: defaultQuantity,
+    };
+    this._dbService.updateGridMenuButton(gridMenuButtonId, obj);
+
+    this.refreshGridItems();
+  }
+
+  onGoBack() {
+    this._router.navigate(['pos']);
+  }
+}

@@ -1,0 +1,67 @@
+<div class="prompt-container">
+  <div class="header">
+    <b>{{ title }}</b>
+    <p>{{ description }}</p>
+  </div>
+
+  <div class="prompt-scroll-area">
+    <div class="numpad-display">
+      {{ centsEntered }}
+    </div>
+    <div class="numpad">
+      <div class="numpad-button" (click)="onNumpad('7')">
+        <div class="text">7</div>
+      </div>
+      <div class="numpad-button" (click)="onNumpad('8')">
+        <div class="text">8</div>
+      </div>
+      <div class="numpad-button" (click)="onNumpad('9')">
+        <div class="text">9</div>
+      </div>
+
+      <div class="numpad-button" (click)="onNumpad('4')">
+        <div class="text">4</div>
+      </div>
+      <div class="numpad-button" (click)="onNumpad('5')">
+        <div class="text">5</div>
+      </div>
+      <div class="numpad-button" (click)="onNumpad('6')">
+        <div class="text">6</div>
+      </div>
+
+      <div class="numpad-button" (click)="onNumpad('1')">
+        <div class="text">1</div>
+      </div>
+      <div class="numpad-button" (click)="onNumpad('2')">
+        <div class="text">2</div>
+      </div>
+      <div class="numpad-button" (click)="onNumpad('3')">
+        <div class="text">3</div>
+      </div>
+
+      <div class="numpad-button" (click)="onNumpad('00')">
+        <div class="text">00</div>
+      </div>
+      <div class="numpad-button" (click)="onNumpad('0')">
+        <div class="text">0</div>
+      </div>
+      <!-- bottom-right blank tile: preserves layout but is inert/blank -->
+      <!-- <div class="numpad-blank"></div> -->
+      <div class="numpad-button" (click)="onNumpad('CLR')">
+        <div class="text">Clear</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 10px" class="button-region">
+    <div
+      *ngFor="let button of options"
+      (click)="onOptionClicked(button, {amount: centsEntered})"
+      class="button"
+    >
+      <div class="text">
+        {{ button }}
+      </div>
+    </div>
+  </div>
+</div>

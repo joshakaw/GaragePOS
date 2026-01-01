@@ -1,0 +1,75 @@
+export const DB_SCHEMA = `
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "Clerk" (
+	"ClerkID"	INT NOT NULL,
+	"FirstName"	TEXT NOT NULL,
+	"LastName"	TEXT NOT NULL,
+	"CreatedAt"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY("ClerkID")
+) STRICT;
+CREATE TABLE IF NOT EXISTS "GridMenu" (
+	"GridMenuID"	INTEGER NOT NULL,
+	CONSTRAINT "GridMenu_PK" PRIMARY KEY("GridMenuID")
+);
+CREATE TABLE IF NOT EXISTS "GridMenuButton" (
+	"GridMenuButtonID"	INTEGER NOT NULL,
+	"GridMenuID"	INTEGER,
+	"ImageID"	INTEGER,
+	"Label"	TEXT,
+	"X"	INTEGER NOT NULL,
+	"Y"	INTEGER NOT NULL,
+	"W"	INTEGER NOT NULL DEFAULT (1),
+	"H"	INTEGER NOT NULL DEFAULT (1),
+	"OnClick_Script"	TEXT NOT NULL,
+	"OnClick_OpenGridMenuID"	INTEGER,
+	"OnClick_AddProductID"	INTEGER,
+	CONSTRAINT "GridMenuButton_PK" PRIMARY KEY("GridMenuButtonID"),
+	CONSTRAINT "GridMenuButton_GridMenu_FK" FOREIGN KEY("GridMenuID") REFERENCES "GridMenu"("GridMenuID") ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT "GridMenuButton_Image_FK" FOREIGN KEY("ImageID") REFERENCES "Image"("ImageID") ON UPDATE CASCADE,
+	CONSTRAINT "GridMenuButton_Product_FK" FOREIGN KEY("OnClick_AddProductID") REFERENCES "Product"("ProductID") ON UPDATE CASCADE,
+	CONSTRAINT "GridMenuButton_GridMenu_FK2" FOREIGN KEY("OnClick_OpenGridMenuID") REFERENCES "GridMenu"("GridMenuID") ON UPDATE CASCADE
+) STRICT;
+CREATE TABLE IF NOT EXISTS "Image" (
+	"ImageID"	INTEGER NOT NULL,
+	"Title"	TEXT NOT NULL,
+	"Data"	BLOB NOT NULL,
+	"CreatedAt"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT "Image_PK" PRIMARY KEY("ImageID")
+) STRICT;
+CREATE TABLE IF NOT EXISTS "Product" (
+	"ProductID"	INTEGER NOT NULL,
+	"Title"	TEXT NOT NULL UNIQUE,
+	"Price"	REAL NOT NULL DEFAULT 0,
+	"TaxRateID"	INT,
+	"CreatedAt"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT "Product_PK" PRIMARY KEY("ProductID"),
+	FOREIGN KEY("TaxRateID") REFERENCES "TaxRate"("TaxRateID")
+) STRICT;
+CREATE TABLE IF NOT EXISTS "TaxRate" (
+	"TaxRateID"	INTEGER NOT NULL,
+	"Label"	TEXT NOT NULL DEFAULT 'Tax',
+	"Rate"	REAL NOT NULL DEFAULT 0.00 CHECK("Rate" < 1 AND "Rate" >= 0),
+	PRIMARY KEY("TaxRateID")
+);
+CREATE TABLE IF NOT EXISTS "Transaction" (
+	"TransactionID"	INTEGER NOT NULL,
+	"ClerkID"	INT NOT NULL,
+	"IsVoided"	INT NOT NULL DEFAULT 0 CHECK("IsVoided" IN (0, 1)),
+	"TimeStarted"	TEXT,
+	"TimeEnded"	TEXT,
+	PRIMARY KEY("TransactionID")
+) STRICT;
+CREATE TABLE IF NOT EXISTS "TransactionDetail" (
+	"TransactionDetailID"	INT NOT NULL,
+	"TransactionID"	INT NOT NULL,
+	"ProductID"	INT NOT NULL,
+	"ProductTitle"	TEXT NOT NULL,
+	"Quantity"	INT NOT NULL DEFAULT 1,
+	"UnitPrice"	REAL NOT NULL DEFAULT 0.00,
+	"IsUnitPriceOverriden"	INT NOT NULL DEFAULT 0 CHECK("IsUnitPriceOverriden" IN (0, 1)),
+	PRIMARY KEY("TransactionDetailID"),
+	FOREIGN KEY("ProductID") REFERENCES "Product"("ProductID"),
+	FOREIGN KEY("TransactionID") REFERENCES "Transaction"("TransactionID")
+) STRICT;
+COMMIT;
+`;
