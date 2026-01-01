@@ -1,4 +1,4 @@
-<div style="width:800px;margin:auto;">
+<div style="margin:auto;">
     <button (click)="onGoBack()">Go Back</button>
     <br><br>
     <label for="menu-select">Select menu</label><br>
@@ -15,6 +15,10 @@
                 {{item.Label}}
             </div>
             }
+            <!-- @else {
+                <button (click)="onAddItem(item, i)">Add Item</button><br>
+                <button (click)="onAddSubmenu(item, i)">Add Submenu</button>
+            } -->
         </div>
     </div>
     <!-- Settings for selected tile -->

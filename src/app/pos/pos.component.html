@@ -37,14 +37,26 @@
       <div class="prompt-host-container">
         <ng-template #promptHost></ng-template>
       </div>
-      <div class="grid" [style.display]="promptActive ? 'none' : 'block'">
+      @if (!promptActive && !configureActive) {
+      <div class="grid">
         <app-preset-grid />
       </div>
+      } @else if (configureActive && !promptActive) {
+      <div class="grid">
+        <app-configure></app-configure>
+
+      </div>
+      }
 
       <div class="function-deck">
         <button class="footer-button footer-button-border-right">
           <div class="text" (click)="onConfigureGrid()">
-            Configure Grid
+            @if (!configureActive) {
+              Configure
+            } @else {
+              Stop Configuring
+            }
+            
           </div>
         </button>
         <!-- <div class="footer-button footer-button-border-right">

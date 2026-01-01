@@ -1,0 +1,20 @@
+<div class="prompt-container">
+    <div class="header">
+        <b>{{title}}</b>
+        <p>{{description}}</p>
+    </div>
+    <div>
+        <select [(ngModel)]="selection">
+            <option *ngFor="let listItem of inputParams.listItems">{{listItem}}</option>
+        </select>
+    </div>
+    <div style="padding:10px" class="button-region">
+        <div *ngFor="let button of options" 
+            (click)="onOptionClicked(button)"
+            class="button">
+            <div class="text">
+                {{button}}
+            </div>
+        </div>
+    </div>
+</div>

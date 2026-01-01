@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DbService } from '../core/services/db/db.service';
-import { DbGridMenuButton, ReservedGridMenuButtonLabel } from '../models/db/product';
+import {
+  DbGridMenuButton,
+  ReservedGridMenuButtonLabel,
+} from '../models/db/product';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
+import { PosService } from '../core/services/pos/pos.service';
 
-// TODO: This logic mirrors the PresetGridComponent very much. 
+// TODO: This logic mirrors the PresetGridComponent very much.
 // Add onclick event listeners to PresetGridComponent to allow this to utilize the
 // same logic (DRY)
 
@@ -28,6 +32,7 @@ export class ConfigureComponent implements OnInit {
   constructor(
     private _router: Router,
     private _dbService: DbService,
+    private _posService: PosService,
     private logger: NGXLogger
   ) {
     this.form = new FormGroup({
@@ -105,6 +110,52 @@ export class ConfigureComponent implements OnInit {
    * @param index The index of the grid item
    */
   onClickGridItem(item: DbGridMenuButton | null, index: number) {
+    // TODO: In case submenu (has a menu onclick action), open it and refresh
+    if (item?.Label == '<BLANK>') {
+      this._posService.triggerPrompt({
+        title: 'Modify Blank Tile',
+        description: 'What action do you want this tile to perform?',
+        type: 'basic',
+        options: ['Add Product', 'Open Submenu', 'Cancel'],
+        dismissable: true,
+        onOptionClick: (btnLbl, data) => {
+          if (btnLbl == 'Add Product') {
+            // Allow user to select item from items list
+
+            // TODO: Implement list-prompt component
+            this._posService.triggerPrompt({
+              type: 'list',
+              title: 'Tile Action: Add Product',
+              description: 'Select the product to add on click',
+              inputParams: {listItems: ['A', 'B', 'C']},
+              options: ['Cancel'],
+              onOptionClick: function (option: string, data: any): void {
+                //alert(data.listItemSelection)
+              },
+              dismissable: true
+            })
+            // Create this GridMenuButton, if doesn't exist
+            // Update the GridMenuButton
+          } else if (btnLbl == 'Open Submenu') {
+            // Create GridMenuButton at this position, if it doesn't exist
+            // Change onclick action of this GridMenuButton
+            // Refresh page so it appears as a submenu
+          }
+        },
+      });
+
+      return;
+    } else {
+      this._posService.triggerPrompt({
+        title: 'Modify Existing Tile',
+        description: '<TODO: Create new Prompt component>',
+        type: 'basic',
+        options: ['Cancel'],
+        dismissable: true,
+        onOptionClick: (btnLbl, data) => {},
+      });
+    }
+
     let coords = this.getXYFromIndex(index);
 
     this.form.patchValue({

@@ -19,13 +19,15 @@ import { DbProduct, ReservedProductId } from '../models/db/product';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ConfigureComponent } from '../configure/configure.component';
+import { ListPromptComponent } from "../prompts/list-prompt/list-prompt.component";
 
 /**
  * Component that handles main POS UI, and the data it displays.
  */
 @Component({
   selector: 'app-pos',
-  imports: [ReceiptComponent, CommonModule, PresetGridComponent],
+  imports: [ReceiptComponent, CommonModule, PresetGridComponent, ConfigureComponent],
   templateUrl: './pos.component.html',
   // schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './pos.component.scss',
@@ -46,6 +48,9 @@ export class PosComponent implements OnInit, OnDestroy {
 
   /** ID of current Transaction being tracked. */
   protected currentTransactionId: number | null = null;
+
+  /** Configuration mode */
+  protected configureActive = false;
 
   items: Array<ReceiptItem> = [];
 
@@ -223,9 +228,7 @@ export class PosComponent implements OnInit, OnDestroy {
   }
 
   onConfigureGrid() {
-    if (!this.promptActive && !this.currentTransactionId) {
-      this._router.navigate(['configure']);
-    } else {
+    if (this.promptActive || this.currentTransactionId) {
       this._posService.triggerPrompt({
         title: 'Button disabled.',
         description:
@@ -235,7 +238,12 @@ export class PosComponent implements OnInit, OnDestroy {
         options: ['Done'],
         onOptionClick: (btnLbl, data) => {},
       });
+
+      return;
     }
+
+    this.configureActive = !this.configureActive;
+    // this._router.navigate(['configure']);
   }
 
   onSafeDrop() {
@@ -325,7 +333,7 @@ export class PosComponent implements OnInit, OnDestroy {
   /**
    * Stores the transaction line items to the
    * database, and resets.
-   * 
+   *
    * @param [isVoid=false] Voided transaction?
    */
   closePayment(isVoid: boolean = false) {

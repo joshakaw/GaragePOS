@@ -1,6 +1,7 @@
 import { Type } from "@angular/core";
 import { NumericPromptComponent } from "../../prompts/numeric-prompt/numeric-prompt.component";
 import { BasicPromptComponent } from "../../prompts/basic-prompt/basic-prompt.component";
+import { ListPromptComponent } from "../../prompts/list-prompt/list-prompt.component";
 
 export class PromptFactory {
 
@@ -15,6 +16,8 @@ export class PromptFactory {
                 return NumericPromptComponent;
             case "basic":
                 return BasicPromptComponent;
+            case "list":
+                return ListPromptComponent;
             default:
                 throw new Error("Prompt component not found.");
         }

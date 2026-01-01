@@ -85,7 +85,7 @@ export interface TriggerPromptParams {
    * Numeric - T,D,O + Number input
    * Text - T,D,O + Text input
    */
-  type: 'basic' | 'currency' | 'numeric' | 'text';
+  type: 'basic' | 'currency' | 'numeric' | 'text' | 'list';
 
   /** Prompt title */
   title: string;
@@ -98,6 +98,11 @@ export interface TriggerPromptParams {
    * returned in callback on click.
    */
   options: Array<string>;
+
+  /**
+   * Custom input parameters (i.e. selection list items)
+   */
+  inputParams?: any;
 
   /**
    * Callback for option selection
