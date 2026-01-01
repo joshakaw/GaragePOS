@@ -120,20 +120,21 @@ export class ConfigureComponent implements OnInit {
         dismissable: true,
         onOptionClick: (btnLbl, data) => {
           if (btnLbl == 'Add Product') {
-            // Allow user to select item from items list
+            let allProducts = this._dbService
+              .getAllProducts()
+              .map((item) => item.Title);
 
-            // TODO: Implement list-prompt component
             this._posService.triggerPrompt({
               type: 'list',
               title: 'Tile Action: Add Product',
               description: 'Select the product to add on click',
-              inputParams: {listItems: ['A', 'B', 'C']},
+              inputParams: { listItems: allProducts },
               options: ['Cancel'],
               onOptionClick: function (option: string, data: any): void {
-                //alert(data.listItemSelection)
+                alert("Selection: " + data.listItemSelection)
               },
-              dismissable: true
-            })
+              dismissable: true,
+            });
             // Create this GridMenuButton, if doesn't exist
             // Update the GridMenuButton
           } else if (btnLbl == 'Open Submenu') {

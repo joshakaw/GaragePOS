@@ -162,6 +162,12 @@ export class DbService {
     return;
   }
 
+  getAllProducts(): Array<DbProduct> {
+    return this.db
+      .prepare(`SELECT * FROM Product ORDER BY Title ASC`)
+      .all() as Array<DbProduct>;
+  }
+
   /**
    * Gets the DbProduct by product ID
    * @param id Id of Product

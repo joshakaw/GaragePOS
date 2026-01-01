@@ -46,3 +46,42 @@
   width: 100%;
   text-align: center;
 }
+
+/* List prompt styles */
+.prompt-container .list-region {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 240px; /* conservative height so buttons below stay visible */
+  overflow-y: auto;
+  overflow-x: hidden; /* prevent horizontal scrollbar */
+  -webkit-overflow-scrolling: touch;
+  padding: 0 10px 10px 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.prompt-container .list-region .button {
+  margin-right: 0; /* override inline right-margin for full-width */
+  width: 100%;
+  box-sizing: border-box; /* ensure padding/border don't cause overflow */
+  height: 80px; /* match action buttons (e.g., Cancel) */
+  min-height: 80px;
+}
+
+.prompt-container .list-region .button .text {
+  justify-content: flex-start; /* left align text */
+  align-items: center; /* vertically center text */
+  padding-left: 15px;
+  text-align: left;
+}
+
+.prompt-container .list-region .button.selected {
+  background-color: $primary;
+  color: #fff;
+  border-color: darken($primary, 7%);
+}
+
+.prompt-container .list-region .button:hover {
+  background-color: lighten($primary, 40%);
+}

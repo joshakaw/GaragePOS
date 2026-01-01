@@ -3,10 +3,15 @@
         <b>{{title}}</b>
         <p>{{description}}</p>
     </div>
-    <div>
-        <select [(ngModel)]="selection">
-            <option *ngFor="let listItem of inputParams.listItems">{{listItem}}</option>
-        </select>
+    <div class="list-region">
+        <div *ngFor="let listItem of inputParams.listItems"
+            (click)="selection = listItem"
+            [class.selected]="selection === listItem"
+            class="button list-item">
+            <div class="text">
+                {{listItem}}
+            </div>
+        </div>
     </div>
     <div style="padding:10px" class="button-region">
         <div *ngFor="let button of options" 
