@@ -207,11 +207,12 @@ export class DbService {
     return result.lastInsertRowid as number;
   }
 
-  endTransaction(transactionId: number) {
+  endTransaction(transactionId: number, isVoid: boolean) {
     let timeEnded = new Date().toISOString();
 
     let obj = {
       TimeEnded: timeEnded,
+      IsVoided: isVoid ? 1 : 0,
       TransactionID: transactionId,
     };
 
@@ -219,7 +220,8 @@ export class DbService {
       .prepare(
         `
         UPDATE "Transaction"
-        SET TimeEnded = @TimeEnded
+        SET TimeEnded = @TimeEnded,
+            IsVoided = @IsVoided
         WHERE TransactionID = @TransactionID
         `
       )

@@ -163,6 +163,10 @@ export class PosComponent implements OnInit, OnDestroy {
     this.receiptViewer.selectedItemIndex = null;
   }
 
+  onVoidTransaction() {
+    this.closePayment(true);
+  }
+
   onQuantityChange() {
     if (!this.currentTransactionId || this.promptActive) {
       return;
@@ -321,8 +325,10 @@ export class PosComponent implements OnInit, OnDestroy {
   /**
    * Stores the transaction line items to the
    * database, and resets.
+   * 
+   * @param [isVoid=false] Voided transaction?
    */
-  closePayment() {
+  closePayment(isVoid: boolean = false) {
     if (!this.currentTransactionId) {
       return;
     }
@@ -332,7 +338,7 @@ export class PosComponent implements OnInit, OnDestroy {
       this._dbService.addTransactionDetail(item, this.currentTransactionId);
     }
 
-    this._dbService.endTransaction(this.currentTransactionId);
+    this._dbService.endTransaction(this.currentTransactionId, isVoid);
 
     this.currentTransactionId = null;
 
