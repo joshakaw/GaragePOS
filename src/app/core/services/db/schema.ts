@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS "GridMenuButton" (
 	"Y"	INTEGER NOT NULL,
 	"W"	INTEGER NOT NULL DEFAULT (1),
 	"H"	INTEGER NOT NULL DEFAULT (1),
-	"OnClick_Script"	TEXT NOT NULL,
+	"OnClick_Script"	TEXT,
 	"OnClick_OpenGridMenuID"	INTEGER,
 	"OnClick_AddProductID"	INTEGER,
 	CONSTRAINT "GridMenuButton_PK" PRIMARY KEY("GridMenuButtonID"),
