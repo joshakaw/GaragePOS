@@ -1,3 +1,13 @@
+# GaragePOS
+A Point of Sale (POS) system for selling items in simple multi-item, cash transactions, like those at garage sales.
+
+# Notes
+This product uses NGX Logger for logging purposes. Use dependency injection
+to bring it into your components to use.
+[NGX Logger](https://www.npmjs.com/package/ngx-logger)
+
+
+The following is from the original Angular-Electron template used to begin the project.
 [![Angular Logo](https://www.vectorlogo.zone/logos/angular/angular-icon.svg)](https://angular.io/) [![Electron Logo](https://www.vectorlogo.zone/logos/electronjs/electronjs-icon.svg)](https://electronjs.org/)
 
 ![Maintained][maintained-badge]
@@ -12,10 +22,6 @@
 [![Star on GitHub][github-star-badge]][github-star]
 [![Tweet][twitter-badge]][twitter]
 
-# Josh Notes
-This product uses NGX Logger for logging purposes. Use dependency injection
-to bring it into your components to use.
-[NGX Logger](https://www.npmjs.com/package/ngx-logger)
 
 # Introduction
 
