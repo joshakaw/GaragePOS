@@ -5,21 +5,23 @@ import {
   PosService,
   TriggerPromptParams,
 } from '../../core/services/pos/pos.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-numeric-prompt',
-  imports: [CommonModule],
-  templateUrl: './numeric-prompt.component.html',
-  styleUrls: ['./numeric-prompt.component.scss', '../shared.scss'],
+  selector: 'app-keyboard-prompt',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './keyboard-prompt.component.html',
+  styleUrls: ['./keyboard-prompt.component.scss', '../shared.scss'],
 })
-export class NumericPromptComponent extends BasePrompt {
+export class KeyboardPromptComponent extends BasePrompt {
   @Input() params!: TriggerPromptParams;
+  inputValue: string = "";
 
   constructor(private _posService: PosService) {
     super();
   }
 
-  protected override onOptionClicked(option: string, data?: {amount: number}): void {
+  protected override onOptionClicked(option: string, data?: {inputValue: string}): void {
     super.onOptionClicked(option, data);
     this.onDismissClicked();
   }

@@ -14,7 +14,7 @@ export type DbGridMenuButton = {
   Y: number;
   W: number;
   H: number;
-  OnClick_Script: string;
+  OnClick_Script: string | null;
   OnClick_OpenGridMenuID: number | null;
   OnClick_AddProductID: number | null;
 };

@@ -37,12 +37,12 @@
       <div class="prompt-host-container">
         <ng-template #promptHost></ng-template>
       </div>
-      @if (!promptActive && !configureActive) {
-      <div class="grid">
-        <app-preset-grid />
+      @if (!configureActive) {
+      <div class="grid" [hidden]="promptActive">
+        <app-preset-grid  />
       </div>
-      } @else if (configureActive && !promptActive) {
-      <div class="grid">
+      } @else {
+      <div class="grid" [hidden]="promptActive">
         <app-configure></app-configure>
 
       </div>

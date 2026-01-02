@@ -88,8 +88,26 @@ export class DbService {
   }
 
   /**
+   * @returns Created GridMenuID
+   */
+  createGridMenu(): number {
+    let result = this.db
+      .prepare(
+        `
+      INSERT INTO GridMenu DEFAULT VALUES;
+      `
+      )
+      .run();
+
+    return result.lastInsertRowid as number;
+  }
+
+  /**
    * Create a GridMenuButton on the database, unless the new
    * obj conflicts with an existing one.
+   *
+   * -1 values signal a replace
+   *
    * @param obj Object to create. `GridMenuButtonID` has no effect.
    * @returns Id of created GridMenuButton
    * @throws Grid menu conflict
@@ -129,6 +147,8 @@ export class DbService {
       `
       )
       .run(obj);
+
+      this.logger.info("Created new GridMenuButton")
 
     return result.lastInsertRowid as number;
   }
@@ -170,8 +190,9 @@ export class DbService {
 
   getProductByName(productName: string): DbProduct {
     // Product names are unique
-    return this.db.prepare(`SELECT * FROM Product WHERE Title = @Title`)
-    .get({Title: productName}) as DbProduct;
+    return this.db
+      .prepare(`SELECT * FROM Product WHERE Title = @Title`)
+      .get({ Title: productName }) as DbProduct;
   }
 
   /**

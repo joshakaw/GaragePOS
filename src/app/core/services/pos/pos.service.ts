@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { DbProduct } from '../../../models/db/product';
+import { PromptTypeOptions } from '../../factories/prompt-factory';
 
 /**
  * Service that handles application-wide Point of Sale (POS) operations,
@@ -77,15 +78,7 @@ export class PosService {
 }
 
 export interface TriggerPromptParams {
-  /**
-   * Type of prompt window.
-   *
-   * Basic - Title, description, options.
-   * Currency - T,D,O + Currency input
-   * Numeric - T,D,O + Number input
-   * Text - T,D,O + Text input
-   */
-  type: 'basic' | 'currency' | 'numeric' | 'text' | 'list';
+  type: PromptTypeOptions;
 
   /** Prompt title */
   title: string;

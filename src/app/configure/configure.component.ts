@@ -72,7 +72,7 @@ export class ConfigureComponent implements OnInit {
       }
     }
 
-    this.logger.info('Grid items refreshed.');
+    this.logger.info(`Grid items refreshed. Grid ID: ${this.selectedGridMenuId}`);
   }
 
   /**
@@ -93,7 +93,7 @@ export class ConfigureComponent implements OnInit {
           Label: ReservedGridMenuButtonLabel.Invisible,
           W: 1,
           H: 1,
-          OnClick_Script: '',
+          OnClick_Script: null,
           OnClick_OpenGridMenuID: null,
           OnClick_AddProductID: null,
         };
@@ -130,7 +130,7 @@ export class ConfigureComponent implements OnInit {
               title: 'Tile Action: Add Product',
               description: 'Select the product to add on click',
               inputParams: { listItems: allProducts },
-              options: ['Select', 'Cancel'],
+              options: ['Cancel', 'Select'],
               onOptionClick: (option: string, data: any): void => {
                 if (option == 'Select') {
                   this.initializeAddProductGridItem(
@@ -146,6 +146,20 @@ export class ConfigureComponent implements OnInit {
             // Update the GridMenuButton
           } else if (btnLbl == 'Open Submenu') {
             // Create GridMenuButton at this position, if it doesn't exist
+
+            this._posService.triggerPrompt({
+              type: 'keyboard',
+              title: 'Tile Action: Open Submenu',
+              description: 'What should the menu be called?',
+              options: ['Cancel', 'Enter'],
+              onOptionClick: (option: string, data: any): void => {
+                if (option == 'Enter') {
+                  this.createSubmenuAndOpen(item, index, data.inputValue);
+                }
+              },
+              dismissable: true,
+            });
+
             // Change onclick action of this GridMenuButton
             // Refresh page so it appears as a submenu
           }
@@ -187,6 +201,44 @@ export class ConfigureComponent implements OnInit {
     return { x, y };
   }
 
+  private createSubmenuAndOpen(
+    item: DbGridMenuButton,
+    index: number,
+    name: string
+  ) {
+    if (item.GridMenuButtonID == -1) {
+      // Create gridmenu
+      let newGridMenuId = this._dbService.createGridMenu();
+
+      try {
+        this._dbService.createGridMenuButton({
+          GridMenuButtonID: -1,
+          GridMenuID: this.selectedGridMenuId,
+          ImageID: null,
+          Label: name,
+          X: item.X,
+          Y: item.Y,
+          W: 1,
+          H: 1,
+          OnClick_Script: null,
+          OnClick_OpenGridMenuID: newGridMenuId,
+          OnClick_AddProductID: null,
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          this.logger.warn('Could not create grid item due to a conflict.');
+        }
+      }
+
+      this.logger.info(`Creating submenu - changing selected Grid Menu ID ${this.selectedGridMenuId} to ${newGridMenuId}`)
+
+      this.selectedGridMenuId = newGridMenuId;
+
+      this.refreshGridItems();
+    }
+  }
+
   initializeAddProductGridItem(
     item: DbGridMenuButton,
     index: number,
@@ -204,7 +256,7 @@ export class ConfigureComponent implements OnInit {
           Y: item.Y,
           W: 1,
           H: 1,
-          OnClick_Script: '',
+          OnClick_Script: null,
           OnClick_OpenGridMenuID: null,
           OnClick_AddProductID: productInfo.ProductID,
         });
@@ -242,7 +294,7 @@ export class ConfigureComponent implements OnInit {
           Y: y,
           W: 1,
           H: 1,
-          OnClick_Script: '',
+          OnClick_Script: null,
           OnClick_OpenGridMenuID: null,
           OnClick_AddProductID: productId,
         });
