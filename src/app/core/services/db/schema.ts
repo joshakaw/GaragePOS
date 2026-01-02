@@ -8,8 +8,10 @@ CREATE TABLE IF NOT EXISTS "Clerk" (
 	PRIMARY KEY("ClerkID")
 ) STRICT;
 CREATE TABLE IF NOT EXISTS "GridMenu" (
-	"GridMenuID"	INTEGER NOT NULL,
-	CONSTRAINT "GridMenu_PK" PRIMARY KEY("GridMenuID")
+        "GridMenuID"    INTEGER NOT NULL,
+        "ParentGridMenuID"      INTEGER,
+        CONSTRAINT "GridMenu_PK" PRIMARY KEY("GridMenuID"),
+        FOREIGN KEY("ParentGridMenuID") REFERENCES "GridMenu"("GridMenuID")
 );
 CREATE TABLE IF NOT EXISTS "GridMenuButton" (
 	"GridMenuButtonID"	INTEGER NOT NULL,

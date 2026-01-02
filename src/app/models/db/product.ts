@@ -51,7 +51,7 @@ export type LocalTransactionDetail = {
 };
 
 export enum ReservedGridMenuButtonLabel {
-  Invisible = "<BLANK>",
+  Invisible = '<BLANK>',
 }
 
 /** Reserved ids [0-100] */

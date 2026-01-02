@@ -208,7 +208,7 @@ export class ConfigureComponent implements OnInit {
   ) {
     if (item.GridMenuButtonID == -1) {
       // Create gridmenu
-      let newGridMenuId = this._dbService.createGridMenu();
+      let newGridMenuId = this._dbService.createGridMenu(this.selectedGridMenuId);
 
       try {
         this._dbService.createGridMenuButton({

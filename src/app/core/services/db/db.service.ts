@@ -90,14 +90,14 @@ export class DbService {
   /**
    * @returns Created GridMenuID
    */
-  createGridMenu(): number {
+  createGridMenu(parentGridMenuId: number): number {
     let result = this.db
       .prepare(
         `
-      INSERT INTO GridMenu DEFAULT VALUES;
+      INSERT INTO GridMenu (ParentGridMenuID) VALUES (@ParentGridMenuID);
       `
       )
-      .run();
+      .run({ParentGridMenuID: parentGridMenuId});
 
     return result.lastInsertRowid as number;
   }
