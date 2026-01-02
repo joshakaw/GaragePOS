@@ -168,6 +168,12 @@ export class DbService {
       .all() as Array<DbProduct>;
   }
 
+  getProductByName(productName: string): DbProduct {
+    // Product names are unique
+    return this.db.prepare(`SELECT * FROM Product WHERE Title = @Title`)
+    .get({Title: productName}) as DbProduct;
+  }
+
   /**
    * Gets the DbProduct by product ID
    * @param id Id of Product

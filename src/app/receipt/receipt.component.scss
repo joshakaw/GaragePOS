@@ -49,11 +49,11 @@ $pad: 20px;
   grid-template-columns: min-content auto; /* 3 rows */
   height: 40px;
   background-color: #fbfbfb;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .row-height {
-  height:40px;
+  height: 40px;
 }
 
 .highlight-bar {
@@ -70,11 +70,11 @@ $pad: 20px;
 }
 
 .receipt-area {
-  position: relative; // ✅ Required so .highlight-bar positions correctly
+  position: relative;
   padding-top: $pad;
   height: 0;
   flex: 1 1 auto;
-  overflow-y: auto;  
+  overflow-y: auto;
   min-height: 0;
   flex-grow: 1;
 }

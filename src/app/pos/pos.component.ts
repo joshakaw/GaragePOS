@@ -1,8 +1,10 @@
 import {
   Component,
+  computed,
   CUSTOM_ELEMENTS_SCHEMA,
   OnDestroy,
   OnInit,
+  Signal,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -20,14 +22,19 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ConfigureComponent } from '../configure/configure.component';
-import { ListPromptComponent } from "../prompts/list-prompt/list-prompt.component";
+import { ListPromptComponent } from '../prompts/list-prompt/list-prompt.component';
 
 /**
  * Component that handles main POS UI, and the data it displays.
  */
 @Component({
   selector: 'app-pos',
-  imports: [ReceiptComponent, CommonModule, PresetGridComponent, ConfigureComponent],
+  imports: [
+    ReceiptComponent,
+    CommonModule,
+    PresetGridComponent,
+    ConfigureComponent,
+  ],
   templateUrl: './pos.component.html',
   // schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './pos.component.scss',
@@ -51,6 +58,13 @@ export class PosComponent implements OnInit, OnDestroy {
 
   /** Configuration mode */
   protected configureActive = false;
+
+  // State
+
+  // Transaction is the main screen right now, no prompts
+  protected get isActiveTransaction(): boolean {
+    return this.currentTransactionId != undefined && !this.promptActive;
+  }
 
   items: Array<ReceiptItem> = [];
 
@@ -158,6 +172,10 @@ export class PosComponent implements OnInit, OnDestroy {
   private onItemAdded(product: DbProduct) {
     // Start a new transaction if not already started
     if (!this.currentTransactionId) {
+      // Resets a closed transaction with items still appearing on receipt.
+      this.items = [];
+      this.selectedItemIndex = null;
+
       this.currentTransactionId = this._dbService.createNewTransaction(1);
     }
 
@@ -350,21 +368,21 @@ export class PosComponent implements OnInit, OnDestroy {
 
     this.currentTransactionId = null;
 
-    this._posService.triggerPrompt({
-      title: 'Transaction finished.',
-      description: 'Press Start to begin next transaction.',
-      dismissable: false,
-      type: 'basic',
-      options: ['Start'],
-      onOptionClick: (btnLbl, data) => {
-        if (btnLbl == 'Start') {
-          // Reset
-          this.items = [];
-          this.currentTransactionId = null;
-          this.selectedItemIndex = null;
-        }
-      },
-    });
+    // this._posService.triggerPrompt({
+    //   title: 'Transaction finished.',
+    //   description: 'Press Start to begin next transaction.',
+    //   dismissable: false,
+    //   type: 'basic',
+    //   options: ['Start'],
+    //   onOptionClick: (btnLbl, data) => {
+    //     if (btnLbl == 'Start') {
+    //       // Reset
+    //       this.items = [];
+    //       this.currentTransactionId = null;
+    //       this.selectedItemIndex = null;
+    //     }
+    //   },
+    // });
   }
 }
 

@@ -54,11 +54,7 @@
   </div>
 
   <div style="padding: 10px" class="button-region">
-    <div
-      *ngFor="let button of options"
-      (click)="onOptionClicked(button, {amount: centsEntered})"
-      class="button"
-    >
+    <div *ngFor="let button of options" (click)="onOptionClicked(button, {amount: amount})" class="button">
       <div class="text">
         {{ button }}
       </div>

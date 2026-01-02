@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { DbService } from '../core/services/db/db.service';
 import {
   DbGridMenuButton,
+  DbProduct,
   ReservedGridMenuButtonLabel,
 } from '../models/db/product';
 import { CommonModule } from '@angular/common';
@@ -129,9 +130,15 @@ export class ConfigureComponent implements OnInit {
               title: 'Tile Action: Add Product',
               description: 'Select the product to add on click',
               inputParams: { listItems: allProducts },
-              options: ['Cancel'],
-              onOptionClick: function (option: string, data: any): void {
-                alert("Selection: " + data.listItemSelection)
+              options: ['Select', 'Cancel'],
+              onOptionClick: (option: string, data: any): void => {
+                if (option == 'Select') {
+                  this.initializeAddProductGridItem(
+                    item,
+                    index,
+                    data.listItemSelection
+                  );
+                }
               },
               dismissable: true,
             });
@@ -180,6 +187,38 @@ export class ConfigureComponent implements OnInit {
     return { x, y };
   }
 
+  initializeAddProductGridItem(
+    item: DbGridMenuButton,
+    index: number,
+    productName: string
+  ) {
+    let productInfo: DbProduct = this._dbService.getProductByName(productName);
+    if (item.GridMenuButtonID == -1) {
+      try {
+        this._dbService.createGridMenuButton({
+          GridMenuButtonID: -1,
+          GridMenuID: this.selectedGridMenuId,
+          ImageID: null,
+          Label: productName,
+          X: item.X,
+          Y: item.Y,
+          W: 1,
+          H: 1,
+          OnClick_Script: '',
+          OnClick_OpenGridMenuID: null,
+          OnClick_AddProductID: productInfo.ProductID,
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          this.logger.warn('Could not create grid item due to a conflict.');
+        }
+      }
+    }
+
+    this.refreshGridItems();
+  }
+
   /**
    * On submitting the tile edit modal.
    */
@@ -210,7 +249,7 @@ export class ConfigureComponent implements OnInit {
       } catch (err) {
         if (err instanceof Error) {
           console.error(err.message);
-          alert('Could not create grid item due to a conflict.');
+          this.logger.warn('Could not create grid item due to a conflict.');
         }
       }
 

@@ -34,6 +34,14 @@ export class NumericPromptComponent extends BasePrompt {
     return (this._centsEntered / 100).toFixed(2);
   }
 
+  /**
+   * Numeric value in dollars (not the formatted string).
+   * Use this when passing numeric data to callers.
+   */
+  get amount(): number {
+    return this._centsEntered / 100;
+  }
+
   onNumpad(btnLabel: string) {
     if (!btnLabel) {
       return;
@@ -47,7 +55,5 @@ export class NumericPromptComponent extends BasePrompt {
       let intValue = parseInt(btnLabel);
       this._centsEntered = this._centsEntered * 10 + intValue;
     }
-
-    throw new Error('Method not implemented.');
   }
 }

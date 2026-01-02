@@ -12,20 +12,20 @@
         [transactionReferenceNumber]="currentTransactionId" (onClickItemIndex)="selectedItemIndex = $event"
         style="flex-grow: 1" />
       <div style="display: flex; flex: none">
-        <button class="footer-button footer-button-border-right" [disabled]="!currentTransactionId || promptActive">
+        <button class="footer-button footer-button-border-right" [disabled]="!isActiveTransaction">
           <div class="text" (click)="onQuantityChange()">
             Change<br />
             Quantity
           </div>
         </button>
         <button class="footer-button footer-button-border-right" (click)="onVoidItem()"
-          [disabled]="!currentTransactionId || promptActive">
+          [disabled]="!isActiveTransaction">
           <div class="text">
             Void<br />
             Item
           </div>
         </button>
-        <button class="footer-button" (click)="onPriceOverride()" [disabled]="!currentTransactionId || promptActive">
+        <button class="footer-button" (click)="onPriceOverride()" [disabled]="!isActiveTransaction">
           <div class="text">
             Price<br />
             Override
@@ -49,7 +49,8 @@
       }
 
       <div class="function-deck">
-        <button class="footer-button footer-button-border-right">
+        <button class="footer-button footer-button-border-right"
+        [disabled]="isActiveTransaction || promptActive">
           <div class="text" (click)="onConfigureGrid()">
             @if (!configureActive) {
               Configure
@@ -74,16 +75,17 @@
             Drop
           </div>
         </div> -->
-        <div class="footer-button footer-button-border-right" (click)="onVoidTransaction()">
+        <button class="footer-button footer-button-border-right" (click)="onVoidTransaction()"
+        [disabled]="!isActiveTransaction">
           <div class="text">
             Void Transaction
           </div>
-        </div>
+        </button>
       </div>
     </div>
     <div class="ending-panel">
       <button class="footer-button" style="width: 100%" (click)="onCashPayment()"
-        [disabled]="!currentTransactionId || promptActive">
+        [disabled]="!isActiveTransaction">
         <div class="text">CASH</div>
       </button>
       <!-- <div class="footer-button" style="width: 100%">
