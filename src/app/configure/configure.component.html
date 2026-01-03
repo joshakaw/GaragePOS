@@ -1,16 +1,15 @@
-<div style="margin:auto;">
-    <!-- <button (click)="onGoBack()">Go Back</button>
+<!-- <button (click)="onGoBack()">Go Back</button>
     <br><br> -->
-    <!-- <label for="menu-select">Select menu</label><br>
+<!-- <label for="menu-select">Select menu</label><br>
     <select id="menu-select" [value]="selectedGridMenuId">
         <option value="1">Main Menu</option>
     </select> -->
 
-    <div class="grid-container" style="height:500px">
-        <!-- <app-preset-grid-button *ngFor="let item of gridItems" ></app-preset-grid-button> -->
-        <div class="app-preset-grid-button" *ngFor="let item of gridItems; let i = index"
-            (click)="onClickGridItem(item, i)" [class.menu]="item.OnClick_OpenGridMenuID != null">
-            @if (item.Label != "<BLANK>") {
+<div class="grid-container">
+    <!-- <app-preset-grid-button *ngFor="let item of gridItems" ></app-preset-grid-button> -->
+    <div class="app-preset-grid-button" *ngFor="let item of gridItems; let i = index" (click)="onClickGridItem(item, i)"
+        [class.menu]="item.OnClick_OpenGridMenuID != null">
+        @if (item.Label != "\<BLANK>") {
             <div class="text">
                 {{item.Label}}
             </div>
@@ -19,10 +18,17 @@
                 <button (click)="onAddItem(item, i)">Add Item</button><br>
                 <button (click)="onAddSubmenu(item, i)">Add Submenu</button>
             } -->
+    </div>
+    <div class="app-preset-grid-button">
+
+        <div class="text">
+            Add a Product
         </div>
     </div>
-    <!-- Settings for selected tile -->
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" [hidden]="true">
+</div>
+
+<!-- Settings for selected tile -->
+<!-- <form [formGroup]="form" (ngSubmit)="onSubmit()" [hidden]="true">
         <b>MODE: Select Product</b><br>
         GridMenuButtonId: <input type="number" formControlName="gridMenuButtonId"><br>
         Tile Label: <input type="text" formControlName="label"><br>
@@ -31,5 +37,4 @@
         X: <input type="number" formControlName="x"><br>
         Y: <input type="number" formControlName="y"><br>
         <button>Save</button>
-    </form>
-</div>
+    </form> -->

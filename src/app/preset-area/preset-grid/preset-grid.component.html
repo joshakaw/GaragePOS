@@ -1,7 +1,7 @@
 <div class="grid-container">
   <!-- <app-preset-grid-button *ngFor="let item of gridItems" ></app-preset-grid-button> -->
   <div class="app-preset-grid-button" *ngFor="let item of gridItems" (click)="handleGridItemClick(item)" [class.menu]="item.OnClick_OpenGridMenuID != null">
-    @if (item.Label != "<BLANK>") {
+    @if (item.Label != "\<BLANK>") {
       <div class="text">
         {{item.Label}}
       </div>

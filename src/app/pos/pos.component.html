@@ -53,9 +53,9 @@
         [disabled]="isActiveTransaction || promptActive">
           <div class="text" (click)="onConfigureGrid()" [class.warn]="configureActive" >
             @if (!configureActive) {
-              Configure
+              Admin Mode
             } @else {
-              Stop Configuring
+              Exit Admin Mode
             }
             
           </div>
@@ -86,7 +86,7 @@
     <div class="ending-panel">
       <button class="footer-button" style="width: 100%" (click)="onCashPayment()"
         [disabled]="!isActiveTransaction">
-        <div class="text">CASH</div>
+        <div class="text">Pay Cash</div>
       </button>
       <!-- <div class="footer-button" style="width: 100%">
         <div class="text">RECEIPT</div>
