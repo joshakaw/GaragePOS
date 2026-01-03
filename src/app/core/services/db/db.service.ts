@@ -87,6 +87,17 @@ export class DbService {
     return items;
   }
 
+  getParentOfGridMenuId(selectedGridMenuId: number): number {
+    var gridMenu = this.db
+      .prepare('SELECT * FROM GridMenu WHERE GridMenuID = @GridMenuID')
+      .get({ GridMenuID: selectedGridMenuId }) as {
+      ParentGridMenuID: number;
+      GridMenuID: number;
+    };
+
+    return gridMenu.ParentGridMenuID;
+  }
+
   /**
    * @returns Created GridMenuID
    */
@@ -97,7 +108,7 @@ export class DbService {
       INSERT INTO GridMenu (ParentGridMenuID) VALUES (@ParentGridMenuID);
       `
       )
-      .run({ParentGridMenuID: parentGridMenuId});
+      .run({ ParentGridMenuID: parentGridMenuId });
 
     return result.lastInsertRowid as number;
   }
@@ -148,7 +159,7 @@ export class DbService {
       )
       .run(obj);
 
-      this.logger.info("Created new GridMenuButton")
+    this.logger.info('Created new GridMenuButton');
 
     return result.lastInsertRowid as number;
   }
@@ -157,15 +168,9 @@ export class DbService {
     id: number,
     obj: {
       label: string;
-      productId: number;
-      defaultQuantity: number;
+      productId: number | null;
     }
   ) {
-    // TODO: Implement default quantity - add column to database
-    this.logger.warn(
-      'Warning: Default quantity not implemented for GridMenuButtons'
-    );
-
     let result = this.db
       .prepare(
         `UPDATE "GridMenuButton"
@@ -180,6 +185,33 @@ export class DbService {
     }
 
     return;
+  }
+
+  deleteGridMenuButton(gridMenuButtonId: number, submenuGridMenuId: number | null) {
+    let result = this.db
+      .prepare(
+        `DELETE FROM GridMenuButton WHERE GridMenuButtonID = @GridMenuButtonID`
+      )
+      .run({
+        GridMenuButtonID: gridMenuButtonId,
+      });
+
+    // If it has a submenu, delete it
+    if (submenuGridMenuId) {
+      let submenuResult = this.db
+        .prepare(`DELETE FROM GridMenu WHERE GridMenuID = @GridMenuID`)
+        .run({
+          GridMenuID: submenuGridMenuId,
+        });
+
+      if (submenuResult.changes == 1) {
+        this.logger.info('Successfully deleted submenu. (fyi - there is a cascade delete for its buttons and submenus.)');
+      }
+    }
+
+    if (result.changes == 1) {
+      this.logger.info('Successfully deleted grid menu button.');
+    }
   }
 
   getAllProducts(): Array<DbProduct> {

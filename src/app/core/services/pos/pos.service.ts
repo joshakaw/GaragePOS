@@ -11,6 +11,7 @@ import { PromptTypeOptions } from '../../factories/prompt-factory';
   providedIn: 'root',
 })
 export class PosService {
+
   private promptSubject = new Subject<TriggerPromptParams | null>();
   /**
    * Triggers either:

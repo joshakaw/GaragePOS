@@ -3,7 +3,11 @@ import { PresetGridButtonComponent } from '../preset-grid-button/preset-grid-but
 import { CommonModule } from '@angular/common';
 import { DbService } from '../../core/services/db/db.service';
 import { PosService } from '../../core/services/pos/pos.service';
-import { DbGridMenuButton, DbProduct, ReservedGridMenuButtonLabel } from '../../models/db/product';
+import {
+  DbGridMenuButton,
+  DbProduct,
+  ReservedGridMenuButtonLabel,
+} from '../../models/db/product';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -16,6 +20,8 @@ export class PresetGridComponent implements OnInit {
   width: number = 7;
   height: number = 5;
   gridItems: Array<DbGridMenuButton> = Array(this.width * this.height);
+
+  protected hasParent: boolean = false;
 
   protected selectedGridMenuId: number = 1; // 1=Main menu by default
 
@@ -35,8 +41,21 @@ export class PresetGridComponent implements OnInit {
     this.refreshGridItems();
   }
 
+  goBack() {
+    this.selectedGridMenuId = this._dbService.getParentOfGridMenuId(
+      this.selectedGridMenuId
+    );
+    this.refreshGridItems();
+  }
+
   // Copied from ConfigureComponent
   refreshGridItems(): void {
+    if (!this._dbService.getParentOfGridMenuId(this.selectedGridMenuId)) {
+      this.hasParent = false;
+    } else {
+      this.hasParent = true;
+    }
+
     this.gridItems = this.createBlankGridItemArray(7, 5);
     // Get menu
     let dbGrid = this._dbService.getGridItems(this.selectedGridMenuId);
@@ -85,7 +104,6 @@ export class PresetGridComponent implements OnInit {
     return tempGridItemsArray;
   }
 
-  
   // Copied from configure componet
   /**
    * Calculates the X,Y coordinates based off of the
@@ -117,6 +135,8 @@ export class PresetGridComponent implements OnInit {
       // Correct method of handling database means that products
       // are never deleted, and we can avoid a bad case from happening.
     } else if (item.OnClick_OpenGridMenuID != null) {
+      this.selectedGridMenuId = item.OnClick_OpenGridMenuID;
+      this.refreshGridItems();
     } else if (item.OnClick_Script != null) {
     }
   }

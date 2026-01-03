@@ -72,7 +72,9 @@ export class ConfigureComponent implements OnInit {
       }
     }
 
-    this.logger.info(`Grid items refreshed. Grid ID: ${this.selectedGridMenuId}`);
+    this.logger.info(
+      `Grid items refreshed. Grid ID: ${this.selectedGridMenuId}`
+    );
   }
 
   /**
@@ -110,7 +112,7 @@ export class ConfigureComponent implements OnInit {
    * @param item Grid menu button that was clicked.
    * @param index The index of the grid item
    */
-  onClickGridItem(item: DbGridMenuButton | null, index: number) {
+  onClickGridItem(item: DbGridMenuButton, index: number) {
     // TODO: In case submenu (has a menu onclick action), open it and refresh
     if (item?.Label == '<BLANK>') {
       this._posService.triggerPrompt({
@@ -169,12 +171,42 @@ export class ConfigureComponent implements OnInit {
       return;
     } else {
       this._posService.triggerPrompt({
-        title: 'Modify Existing Tile',
-        description: '<TODO: Create new Prompt component>',
-        type: 'basic',
-        options: ['Cancel'],
-        dismissable: true,
-        onOptionClick: (btnLbl, data) => {},
+        type: 'edit-tile',
+        title: 'Edit Tile',
+        description: 'Modify tile appearance',
+        inputParams: {
+          gridMenuButton: item,
+        },
+        options: ['Delete', 'Cancel', 'Save'],
+        onOptionClick: (option: string, data: any): void => {
+          if (option == 'Delete') {
+            this._posService.triggerPrompt({
+              type: 'basic',
+              title: 'Confirm',
+              description: 'Are you sure?',
+              options: ['Yes', 'No'],
+              onOptionClick: (option, data) => {
+                if (option == 'Yes') {
+                  this._dbService.deleteGridMenuButton(
+                    item.GridMenuButtonID,
+                    item.OnClick_OpenGridMenuID
+                  );
+                }
+
+                this.refreshGridItems();
+              },
+              dismissable: false,
+            });
+          } else if (option == 'Save') {
+            this._dbService.updateGridMenuButton(item.GridMenuButtonID, {
+              label: data.newLabel,
+              productId: item.OnClick_AddProductID,
+            });
+
+            this.refreshGridItems();
+          }
+        },
+        dismissable: false,
       });
     }
 
@@ -208,7 +240,9 @@ export class ConfigureComponent implements OnInit {
   ) {
     if (item.GridMenuButtonID == -1) {
       // Create gridmenu
-      let newGridMenuId = this._dbService.createGridMenu(this.selectedGridMenuId);
+      let newGridMenuId = this._dbService.createGridMenu(
+        this.selectedGridMenuId
+      );
 
       try {
         this._dbService.createGridMenuButton({
@@ -231,7 +265,9 @@ export class ConfigureComponent implements OnInit {
         }
       }
 
-      this.logger.info(`Creating submenu - changing selected Grid Menu ID ${this.selectedGridMenuId} to ${newGridMenuId}`)
+      this.logger.info(
+        `Creating submenu - changing selected Grid Menu ID ${this.selectedGridMenuId} to ${newGridMenuId}`
+      );
 
       this.selectedGridMenuId = newGridMenuId;
 

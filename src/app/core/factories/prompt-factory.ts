@@ -3,6 +3,7 @@ import { NumericPromptComponent } from '../../prompts/numeric-prompt/numeric-pro
 import { BasicPromptComponent } from '../../prompts/basic-prompt/basic-prompt.component';
 import { ListPromptComponent } from '../../prompts/list-prompt/list-prompt.component';
 import { KeyboardPromptComponent } from '../../prompts/keyboard-prompt/keyboard-prompt.component';
+import { EditTilePromptComponent } from '../../prompts/edit-tile-prompt/edit-tile-prompt.component';
 
 /**
  * Type of prompt window.
@@ -11,8 +12,9 @@ import { KeyboardPromptComponent } from '../../prompts/keyboard-prompt/keyboard-
  * Currency - T,D,O + Currency input
  * Numeric - T,D,O + Number input
  * Keyboard - T,D,O + Text input
+ * Edit Tile - Custom
  */
-export type PromptTypeOptions = 'basic' | 'numeric' | 'list' | 'keyboard';
+export type PromptTypeOptions = 'basic' | 'numeric' | 'list' | 'keyboard' | 'edit-tile';
 
 export class PromptFactory {
   /**
@@ -30,6 +32,8 @@ export class PromptFactory {
         return ListPromptComponent;
       case 'keyboard':
         return KeyboardPromptComponent;
+      case 'edit-tile':
+        return EditTilePromptComponent;
       default:
         throw new Error('Prompt component not found.');
     }

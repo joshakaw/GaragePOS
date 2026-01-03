@@ -17,6 +17,21 @@
     margin-left: 10px;
 }
 
+$field-width: 400px;
+
+.prompt-container .field-display {
+  border: 1px solid #DDD;
+  margin: 10px;
+  padding: 10px;
+  font-size: 1.5em;
+  background-color: #f9f9f9;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  width: $field-width;
+}
+
 .prompt-container .button {
   flex: 1;
   height: 80px;

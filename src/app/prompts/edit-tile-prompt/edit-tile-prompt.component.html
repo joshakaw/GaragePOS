@@ -1,0 +1,18 @@
+<div class="prompt-container">
+    <div class="header">
+        <b>{{title}}</b>
+        <p>{{description}}</p>
+    </div>
+    <div>
+        Label: <input class="field-display" [(ngModel)]="label"> <br>
+
+        <i>To change the product or submenu of this tile, delete and configure a new tile.</i>
+    </div>
+    <div style="padding:10px" class="button-region">
+        <div *ngFor="let button of options" (click)="onOptionClicked(button, {newLabel: label})" class="button">
+            <div class="text">
+                {{button}}
+            </div>
+        </div>
+    </div>
+</div>

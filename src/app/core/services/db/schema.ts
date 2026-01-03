@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "GridMenu" (
         "GridMenuID"    INTEGER NOT NULL,
         "ParentGridMenuID"      INTEGER,
         CONSTRAINT "GridMenu_PK" PRIMARY KEY("GridMenuID"),
-        FOREIGN KEY("ParentGridMenuID") REFERENCES "GridMenu"("GridMenuID")
+        FOREIGN KEY("ParentGridMenuID") REFERENCES "GridMenu"("GridMenuID") ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "GridMenuButton" (
 	"GridMenuButtonID"	INTEGER NOT NULL,

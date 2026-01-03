@@ -1,10 +1,10 @@
 <div style="margin:auto;">
     <!-- <button (click)="onGoBack()">Go Back</button>
     <br><br> -->
-    <label for="menu-select">Select menu</label><br>
+    <!-- <label for="menu-select">Select menu</label><br>
     <select id="menu-select" [value]="selectedGridMenuId">
         <option value="1">Main Menu</option>
-    </select>
+    </select> -->
 
     <div class="grid-container" style="height:500px">
         <!-- <app-preset-grid-button *ngFor="let item of gridItems" ></app-preset-grid-button> -->
@@ -22,7 +22,7 @@
         </div>
     </div>
     <!-- Settings for selected tile -->
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" [hidden]="true">
         <b>MODE: Select Product</b><br>
         GridMenuButtonId: <input type="number" formControlName="gridMenuButtonId"><br>
         Tile Label: <input type="text" formControlName="label"><br>

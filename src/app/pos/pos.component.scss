@@ -98,6 +98,16 @@ button {
   text-align: center;
 }
 
+@keyframes color-blink {
+    0% { background-color: white; }
+    50% { background-color: rgb(196, 196, 196); }
+    100% { background-color: white; }
+}
+.footer-button .text.warn {
+  background-color: rgb(255, 255, 0);
+  animation: color-blink 1s infinite;
+}
+
 .center-column {
   display: flex;
   flex-direction: column;

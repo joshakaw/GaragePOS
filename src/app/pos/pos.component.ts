@@ -17,7 +17,11 @@ import { PresetGridComponent } from '../preset-area/preset-grid/preset-grid.comp
 import { DbService } from '../core/services/db/db.service';
 import { PromptFactory } from '../core/factories/prompt-factory';
 import { TransactionService } from '../core/services/transaction/transaction.service';
-import { DbProduct, ReservedProductId } from '../models/db/product';
+import {
+  DbGridMenuButton,
+  DbProduct,
+  ReservedProductId,
+} from '../models/db/product';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -98,7 +102,8 @@ export class PosComponent implements OnInit, OnDestroy {
       .subscribe((product) => this.onItemAdded(product));
   }
   /** Performs on initialization */
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
   ngOnDestroy(): void {
     this._posService.promptHandled();

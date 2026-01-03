@@ -51,7 +51,7 @@
       <div class="function-deck">
         <button class="footer-button footer-button-border-right"
         [disabled]="isActiveTransaction || promptActive">
-          <div class="text" (click)="onConfigureGrid()">
+          <div class="text" (click)="onConfigureGrid()" [class.warn]="configureActive" >
             @if (!configureActive) {
               Configure
             } @else {
