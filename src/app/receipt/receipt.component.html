@@ -1,7 +1,6 @@
 <div class="app-receipt">
-  <div class="info-area pad-left pad-right">
-    Garage POS V0.0.1; JM<br>
-    {{transactionReferenceNumber ? "#" + transactionReferenceNumber : "No Active Transaction"}}
+  <div class="info-area pad-left pad-right" style="padding-top:10px;text-align: center">
+    {{transactionReferenceNumber ? "#" + transactionReferenceNumber : "Ready for Next Transaction"}}
   </div>
   <div class="receipt-area">
     <div #highlightBar class="highlight-bar"></div>

@@ -152,7 +152,7 @@ button {
 
 .grid {
   flex: 1 1 auto;
-  background: #e9f5ff;
+   background-image: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.06) 30%), linear-gradient(180deg, #dbefff, darken(#dbefff, 8%));
   padding: 8px;
   height: 100%;
   box-sizing: border-box;
