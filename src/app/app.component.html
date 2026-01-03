@@ -1,1 +1,114 @@
-<router-outlet></router-outlet>
+<!-- <div style="width:800px;margin:auto;padding:10px">
+
+</div> -->
+
+<div class="my-container">
+    <!-- <div class="title">
+        POS System
+    </div> -->
+    <div class="content">
+        <div class="receipt">
+            <app-receipt [receiptItemList]="items" [selectedItemIndex]="selectedItemIndex"
+                [transactionReferenceNumber]="currentTransactionId" (onClickItemIndex)="selectedItemIndex = $event"
+                style="flex-grow: 1" />
+            <div style="display: flex; flex: none">
+                <button class="footer-button footer-button-border-right" [disabled]="!isActiveTransaction">
+                    <div class="text" (click)="onQuantityChange()">
+                        Change<br />
+                        Quantity
+                    </div>
+                </button>
+                <button class="footer-button footer-button-border-right" (click)="onVoidItem()"
+                    [disabled]="!isActiveTransaction">
+                    <div class="text">
+                        Void<br />
+                        Item
+                    </div>
+                </button>
+                <button class="footer-button" (click)="onPriceOverride()" [disabled]="!isActiveTransaction">
+                    <div class="text">
+                        Override<br />
+                        Price
+                    </div>
+                </button>
+            </div>
+        </div>
+        <div class="center-column">
+            <div class="prompt-host-container">
+                <ng-template #promptHost></ng-template>
+            </div>
+            <div class="grid" [hidden]="promptActive">
+                <router-outlet></router-outlet>
+            </div>
+            <!-- @if (!configureActive) {
+      <div class="grid" [hidden]="promptActive">
+        <app-preset-grid  />
+      </div>
+      } @else {
+      <div class="grid" [hidden]="promptActive">
+        <app-configure></app-configure>
+
+      </div>
+      } -->
+
+            <div class="function-deck">
+                <button class="footer-button footer-button-border-right">
+                    <div class="text" (click)="navigateConditional('grid')">
+                        Home
+                    </div>
+                </button>
+                <button class="footer-button footer-button-border-right" [disabled]="isActiveTransaction || promptActive">
+                    <div class="text" (click)="navigateConditional('configure')" [class.warn]="configureActive">
+                        Configure Grid
+                    </div>
+                </button>
+                <button class="footer-button footer-button-border-right" [disabled]="isActiveTransaction || promptActive">
+                    <div class="text" (click)="navigateConditional('reports')">
+                        Manage Products
+                    </div>
+                </button>
+                                <button class="footer-button" [disabled]="isActiveTransaction || promptActive">
+                    <div class="text" (click)="navigateConditional('reports')">
+                       Reports
+                    </div>
+                </button>
+                <!-- <div class="footer-button footer-button-border-right">
+          <div class="text">
+            Other<br />
+            Function
+          </div>
+        </div> -->
+                <!-- <div
+          class="footer-button footer-button-border-right"
+          (click)="onSafeDrop()"
+        >
+          <div class="text">
+            Safe<br />
+            Drop
+          </div>
+        </div> -->
+                <!-- <button class="footer-button footer-button-border-right" (click)="onVoidTransaction()"
+                    [disabled]="!isActiveTransaction">
+                    <div class="text">
+                        Void Transaction
+                    </div>
+                </button> -->
+            </div>
+        </div>
+        <div class="ending-panel">
+            <button class="footer-button" (click)="onCashPayment()" [disabled]="!isActiveTransaction">
+                <div class="text">Pay Cash</div>
+            </button>
+            <button class="footer-button-mod" (click)="onVoidTransaction()" [disabled]="!isActiveTransaction">
+                <div class="text">
+                    Void Trans.
+                </div>
+            </button>
+            <!-- <div class="footer-button" style="width: 100%">
+        <div class="text">RECEIPT</div>
+      </div> -->
+        </div>
+    </div>
+    <!-- <div class="footer">
+    </div> -->
+</div>

@@ -14,9 +14,9 @@ import { HttpClient } from '@angular/common/http';
 import { PageNotFoundComponent } from './app/shared/components';
 import { HomeComponent } from './app/home/home.component';
 import { DetailComponent } from './app/detail/detail.component';
-import { PosComponent } from './app/pos/pos.component';
 import { ConfigureComponent } from './app/configure/configure.component';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { PresetGridComponent } from './app/preset-area/preset-grid/preset-grid.component';
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -31,20 +31,16 @@ bootstrapApplication(AppComponent, {
     provideRouter([
       {
         path: '',
-        redirectTo: 'pos',
+        redirectTo: 'grid',
         pathMatch: 'full'
-      },
-      {
-        path: 'pos',
-        component: PosComponent
       },
       {
         path: 'configure',
         component: ConfigureComponent
       },
       {
-        path: 'home',
-        component: HomeComponent
+        path: 'grid',
+        component: PresetGridComponent
       },
       {
         path: 'detail',
