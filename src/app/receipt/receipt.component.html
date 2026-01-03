@@ -26,13 +26,10 @@
                 </tr>
             </thead> -->
       <tbody>
-        <tr
-          *ngFor="let receiptItem of receiptItemList; let i = index"
-          [ngClass]="{ selected: i == selectedItemIndex }"
-          (click)="onClickItem(i)"
-        >
+        <tr *ngFor="let receiptItem of receiptItemList; let i = index" [ngClass]="{ selected: i == selectedItemIndex }"
+          (click)="onClickItem(i)">
           <td class="pad-left row-height">
-            {{  receiptItem.quantity }}
+            {{ receiptItem.quantity }}
           </td>
           <td>
             {{ receiptItem.name }}
@@ -44,22 +41,21 @@
       </tbody>
     </table>
   </div>
-  @if(changeAmount() != null) {
-  <div>Subtotal: {{displaySubtotal}}</div>
   <div class="summary-area pad">
-    <div>Change</div>
-    <div style="text-align: right">
+    <div class="detailtext">Subtotal</div>
+    <div class="detailtext" style="text-align:right;">{{displaySubtotal}}</div>
+    
+
+    @if(changeAmount() != null) {
+    <div class="text">Change</div>
+    <div class="text" style="text-align: right">
       {{ changeAmount() }}
     </div>
-  </div>
-  } @else {
-  <div>Subtotal: {{displaySubtotal}}</div>
-  <div class="summary-area pad">
-    <div>Balance</div>
-    <div style="text-align: right">
+    } @else {
+    <div class="text">Balance</div>
+    <div class="text" style="text-align: right">
       {{ displaySubtotal }}
     </div>
+    }
   </div>
-  }
-
 </div>

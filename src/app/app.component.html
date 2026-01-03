@@ -57,12 +57,12 @@
                         Home
                     </div>
                 </button>
-                <button class="footer-button footer-button-border-right" [disabled]="isActiveTransaction || promptActive">
+                <button class="footer-button" [disabled]="isActiveTransaction || promptActive">
                     <div class="text" (click)="navigateConditional('configure')" [class.warn]="configureActive">
                         Configure Grid
                     </div>
                 </button>
-                <button class="footer-button footer-button-border-right" [disabled]="isActiveTransaction || promptActive">
+                <!-- <button class="footer-button footer-button-border-right" [disabled]="isActiveTransaction || promptActive">
                     <div class="text" (click)="navigateConditional('reports')">
                         Manage Products
                     </div>
@@ -71,7 +71,7 @@
                     <div class="text" (click)="navigateConditional('reports')">
                        Reports
                     </div>
-                </button>
+                </button> -->
                 <!-- <div class="footer-button footer-button-border-right">
           <div class="text">
             Other<br />

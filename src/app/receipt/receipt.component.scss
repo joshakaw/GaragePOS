@@ -43,12 +43,20 @@ $pad: 20px;
   width: 100%;
 }
 
+.summary-area .detailtext {
+  color: darkgray;
+}
+
+.summary-area .text {
+    font-size: 24px;
+    font-weight: bold;
+}
+
 .summary-area {
-  font-size: 24px;
   display: grid;
   grid-template-columns: min-content auto; /* 3 rows */
-  height: 40px;
   background-color: #fbfbfb;
+  row-gap: 8px;
   flex-shrink: 0;
 }
 
