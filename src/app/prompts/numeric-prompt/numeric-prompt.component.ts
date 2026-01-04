@@ -10,7 +10,7 @@ import {
   selector: 'app-numeric-prompt',
   imports: [CommonModule],
   templateUrl: './numeric-prompt.component.html',
-  styleUrls: ['./numeric-prompt.component.scss', '../shared.scss'],
+  styleUrls: ['./numeric-prompt.component.scss', '../../shared.scss'],
 })
 export class NumericPromptComponent extends BasePrompt {
   @Input() params!: TriggerPromptParams;

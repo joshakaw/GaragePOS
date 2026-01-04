@@ -187,7 +187,10 @@ export class DbService {
     return;
   }
 
-  deleteGridMenuButton(gridMenuButtonId: number, submenuGridMenuId: number | null) {
+  deleteGridMenuButton(
+    gridMenuButtonId: number,
+    submenuGridMenuId: number | null
+  ) {
     let result = this.db
       .prepare(
         `DELETE FROM GridMenuButton WHERE GridMenuButtonID = @GridMenuButtonID`
@@ -205,7 +208,9 @@ export class DbService {
         });
 
       if (submenuResult.changes == 1) {
-        this.logger.info('Successfully deleted submenu. (fyi - there is a cascade delete for its buttons and submenus.)');
+        this.logger.info(
+          'Successfully deleted submenu. (fyi - there is a cascade delete for its buttons and submenus.)'
+        );
       }
     }
 
@@ -214,9 +219,24 @@ export class DbService {
     }
   }
 
+  /**
+   * @returns Newly created ProductID
+   */
+  createProduct(title: string, price: number): number {
+    let result = this.db
+      .prepare(`INSERT INTO Product (Title, Price) VALUES (@Title, @Price)`)
+      .run({
+        Title: title,
+        Price: price
+      });
+
+      this.logger.info("New product with ID " + result.lastInsertRowid + " was created.")
+    return result.lastInsertRowid as number;
+  }
+
   getAllProducts(): Array<DbProduct> {
     return this.db
-      .prepare(`SELECT * FROM Product ORDER BY Title ASC`)
+      .prepare(`SELECT * FROM Product WHERE ProductId > 100 ORDER BY Title ASC`) // WHERE disincludes system products
       .all() as Array<DbProduct>;
   }
 

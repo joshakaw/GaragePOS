@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-keyboard-prompt',
   imports: [CommonModule, FormsModule],
   templateUrl: './keyboard-prompt.component.html',
-  styleUrls: ['./keyboard-prompt.component.scss', '../shared.scss'],
+  styleUrls: ['./keyboard-prompt.component.scss', '../../shared.scss'],
 })
 export class KeyboardPromptComponent extends BasePrompt {
   @Input() params!: TriggerPromptParams;

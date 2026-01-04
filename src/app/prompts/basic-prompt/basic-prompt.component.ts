@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-basic-prompt',
   imports: [CommonModule],
   templateUrl: './basic-prompt.component.html',
-  styleUrls: ['./basic-prompt.component.scss', '../shared.scss']
+  styleUrls: ['./basic-prompt.component.scss', '../../shared.scss']
 })
 export class BasicPromptComponent extends BasePrompt {
 

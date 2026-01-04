@@ -1,0 +1,11 @@
+<div class="list-region" >    
+    <div class="button new" (click)="onNew()">
+        <div class="text">New</div>
+    </div>
+    <div class="button item" *ngFor="let product of products">
+        <div class="text">
+            {{product.Title}}
+            <div style="font-size: small">${{product.Price.toFixed(2)}}</div>
+        </div>
+    </div>
+</div>

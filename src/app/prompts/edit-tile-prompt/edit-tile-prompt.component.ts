@@ -12,7 +12,7 @@ import { DbGridMenuButton } from '../../models/db/product';
   selector: 'app-edit-tile-prompt',
   imports: [CommonModule, FormsModule],
   templateUrl: './edit-tile-prompt.component.html',
-  styleUrls: ['./edit-tile-prompt.component.scss', '../shared.scss'],
+  styleUrls: ['./edit-tile-prompt.component.scss', '../../shared.scss'],
 })
 export class EditTilePromptComponent extends BasePrompt {
   @Input() params!: TriggerPromptParams;

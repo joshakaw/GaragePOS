@@ -70,6 +70,12 @@ button {
   opacity: 0.5;
 }
 
+// when user is navigated to the footer butotn url
+.footer-button.navigated {
+  //background-color: #B2DDFF;
+  border-top: 2px solid $primary;
+}
+
 .footer-button-mod:disabled {
   opacity: 0.5;
 }

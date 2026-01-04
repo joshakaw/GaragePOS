@@ -1,6 +1,9 @@
 import { enableProdMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
@@ -12,14 +15,15 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
 import { PageNotFoundComponent } from './app/shared/components';
-import { HomeComponent } from './app/home/home.component';
-import { DetailComponent } from './app/detail/detail.component';
 import { ConfigureComponent } from './app/configure/configure.component';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 import { PresetGridComponent } from './app/preset-area/preset-grid/preset-grid.component';
+import { ReportPageComponent } from './app/pages/report-page/report-page.component';
+import { ProductPageComponent } from './app/pages/product-page/product-page.component';
 
 // AoT requires an exported function for factories
-const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
+const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
+  new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
 if (APP_CONFIG.production) {
   enableProdMode();
@@ -32,24 +36,28 @@ bootstrapApplication(AppComponent, {
       {
         path: '',
         redirectTo: 'grid',
-        pathMatch: 'full'
-      },
-      {
-        path: 'configure',
-        component: ConfigureComponent
+        pathMatch: 'full',
       },
       {
         path: 'grid',
-        component: PresetGridComponent
+        component: PresetGridComponent,
       },
       {
-        path: 'detail',
-        component: DetailComponent
+        path: 'configure',
+        component: ConfigureComponent,
+      },
+      {
+        path: 'report',
+        component: ReportPageComponent,
+      },
+      {
+        path: 'product',
+        component: ProductPageComponent,
       },
       {
         path: '**',
-        component: PageNotFoundComponent
-      }
+        component: PageNotFoundComponent,
+      },
 
       // TODO: Add an edit mode component that allows modifying the grid
     ]),
@@ -60,13 +68,13 @@ bootstrapApplication(AppComponent, {
         loader: {
           provide: TranslateLoader,
           useFactory: httpLoaderFactory,
-          deps: [HttpClient]
-        }
+          deps: [HttpClient],
+        },
       }),
       // Creates the NGX Logger - you can set level of what shows here.
       LoggerModule.forRoot({
-        level: NgxLoggerLevel.TRACE
+        level: NgxLoggerLevel.TRACE,
       })
-    )
-  ]
-}).catch(err => console.error(err));
+    ),
+  ],
+}).catch((err) => console.error(err));

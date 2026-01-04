@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-list-prompt',
   imports: [CommonModule, FormsModule],
   templateUrl: './list-prompt.component.html',
-  styleUrls: ['./list-prompt.component.scss', '../shared.scss'],
+  styleUrls: ['./list-prompt.component.scss', '../../shared.scss'],
 })
 export class ListPromptComponent extends BasePrompt {
   @Input() params!: TriggerPromptParams;

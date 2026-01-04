@@ -22,7 +22,7 @@ import {
   DbProduct,
   ReservedProductId,
 } from './models/db/product';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, RouterLinkWithHref, RouterLinkActive } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ConfigureComponent } from './configure/configure.component';
@@ -42,7 +42,9 @@ import { APP_CONFIG } from '../environments/environment';
     PresetGridComponent,
     ConfigureComponent,
     RouterOutlet,
-  ],
+    RouterLinkWithHref,
+    RouterLinkActive
+],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,

@@ -52,24 +52,36 @@
       } -->
 
             <div class="function-deck">
-                <button class="footer-button footer-button-border-right">
+                <button class="footer-button footer-button-border-right"
+                                [routerLink]="['/grid']"
+                routerLinkActive="navigated"
+                [disabled]="promptActive">
                     <div class="text" (click)="navigateConditional('grid')">
                         Home
                     </div>
                 </button>
-                <button class="footer-button" [disabled]="isActiveTransaction || promptActive">
-                    <div class="text" (click)="navigateConditional('configure')" [class.warn]="configureActive">
+                <button class="footer-button footer-button-border-right" 
+                [routerLink]="['/configure']"
+                routerLinkActive="navigated"
+                [disabled]="isActiveTransaction || promptActive">
+                    <div class="text" (click)="navigateConditional('configure')">
                         Configure Grid
                     </div>
                 </button>
-                <!-- <button class="footer-button footer-button-border-right" [disabled]="isActiveTransaction || promptActive">
-                    <div class="text" (click)="navigateConditional('reports')">
-                        Manage Products
+                <button class="footer-button"
+                                [routerLink]="['/product']"
+                routerLinkActive="navigated"
+                    [disabled]="isActiveTransaction || promptActive">
+                    <div class="text" (click)="navigateConditional('product')">
+                        Products
                     </div>
                 </button>
-                                <button class="footer-button" [disabled]="isActiveTransaction || promptActive">
-                    <div class="text" (click)="navigateConditional('reports')">
-                       Reports
+                <!-- <button class="footer-button"
+                                [routerLink]="['/report']"
+                routerLinkActive="navigated"
+                [disabled]="isActiveTransaction || promptActive">
+                    <div class="text" (click)="navigateConditional('report')">
+                        Reports
                     </div>
                 </button> -->
                 <!-- <div class="footer-button footer-button-border-right">
