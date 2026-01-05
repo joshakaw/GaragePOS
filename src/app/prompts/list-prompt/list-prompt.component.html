@@ -4,12 +4,12 @@
         <p>{{description}}</p>
     </div>
     <div class="list-region">
-        <div *ngFor="let listItem of inputParams.listItems"
+        <div *ngFor="let listItem of inputParams.items"
             (click)="selection = listItem"
             [class.selected]="selection === listItem"
             class="button list-item">
             <div class="text">
-                {{listItem}}
+                {{inputParams.map(listItem)}}
             </div>
         </div>
     </div>

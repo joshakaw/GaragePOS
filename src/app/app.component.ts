@@ -39,8 +39,6 @@ import { APP_CONFIG } from '../environments/environment';
   imports: [
     ReceiptComponent,
     CommonModule,
-    PresetGridComponent,
-    ConfigureComponent,
     RouterOutlet,
     RouterLinkWithHref,
     RouterLinkActive
@@ -271,8 +269,8 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
-  navigateConditional(url: string) {
-    if(this.isActiveTransaction || this.promptActive){
+  navigateConditional(url: string, blockDuringTransaction: boolean) {
+    if((this.isActiveTransaction && blockDuringTransaction)  || this.promptActive){
       return;
     }
     this._router.navigate([url]);

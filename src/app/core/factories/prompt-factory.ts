@@ -4,6 +4,9 @@ import { BasicPromptComponent } from '../../prompts/basic-prompt/basic-prompt.co
 import { ListPromptComponent } from '../../prompts/list-prompt/list-prompt.component';
 import { KeyboardPromptComponent } from '../../prompts/keyboard-prompt/keyboard-prompt.component';
 import { EditTilePromptComponent } from '../../prompts/edit-tile-prompt/edit-tile-prompt.component';
+import { EditProductPromptComponent } from '../../prompts/edit-product-prompt/edit-product-prompt.component';
+
+// TODO: Move this class to /prompts folder
 
 /**
  * Type of prompt window.
@@ -14,7 +17,13 @@ import { EditTilePromptComponent } from '../../prompts/edit-tile-prompt/edit-til
  * Keyboard - T,D,O + Text input
  * Edit Tile - Custom
  */
-export type PromptTypeOptions = 'basic' | 'numeric' | 'list' | 'keyboard' | 'edit-tile';
+export type PromptTypeOptions =
+  | 'basic'
+  | 'numeric'
+  | 'list'
+  | 'keyboard'
+  | 'edit-tile'
+  | 'edit-product';
 
 export class PromptFactory {
   /**
@@ -34,6 +43,8 @@ export class PromptFactory {
         return KeyboardPromptComponent;
       case 'edit-tile':
         return EditTilePromptComponent;
+      case 'edit-product':
+        return EditProductPromptComponent;
       default:
         throw new Error('Prompt component not found.');
     }

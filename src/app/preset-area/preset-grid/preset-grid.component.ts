@@ -20,6 +20,7 @@ export class PresetGridComponent implements OnInit {
   width: number = 7;
   height: number = 5;
   gridItems: Array<DbGridMenuButton> = Array(this.width * this.height);
+  configureMode: boolean = false;
 
   protected hasParent: boolean = false;
 
@@ -46,6 +47,10 @@ export class PresetGridComponent implements OnInit {
       this.selectedGridMenuId
     );
     this.refreshGridItems();
+  }
+
+  onConfigure() {
+    this.configureMode = !this.configureMode;
   }
 
   // Copied from ConfigureComponent
@@ -122,7 +127,10 @@ export class PresetGridComponent implements OnInit {
    * defined for this grid button.
    * @param item Item that was clicked
    */
-  handleGridItemClick(item: DbGridMenuButton) {
+  handleGridItemClick(item: DbGridMenuButton, index: number) {
+    if (this.configureMode) {
+      return this.handleGridItemClickConfigure(item, index);
+    }
     if (item.OnClick_AddProductID) {
       // Get Product
       let product = this._dbService.getProduct(item.OnClick_AddProductID);
@@ -139,6 +147,185 @@ export class PresetGridComponent implements OnInit {
       this.refreshGridItems();
     } else if (item.OnClick_Script != null) {
     }
+  }
+
+  handleGridItemClickConfigure(item: DbGridMenuButton, index: number) {
+    this.logger.info(item);
+    if (item.OnClick_AddProductID) {
+      // Product tile
+      this._posService.triggerPrompt({
+        type: 'edit-tile',
+        title: 'Edit Tile',
+        description: 'Modify tile appearance',
+        inputParams: {
+          gridMenuButton: item,
+        },
+        options: ['Delete', 'Cancel', 'Save'],
+        onOptionClick: (option: string, data: any): void => {
+          if (option == 'Delete') {
+            this._posService.triggerPrompt({
+              type: 'basic',
+              title: 'Confirm',
+              description: 'Are you sure?',
+              options: ['Yes', 'No'],
+              onOptionClick: (option, data) => {
+                if (option == 'Yes') {
+                  this._dbService.deleteGridMenuButton(
+                    item.GridMenuButtonID,
+                    item.OnClick_OpenGridMenuID
+                  );
+                }
+
+                this.refreshGridItems();
+              },
+              dismissable: false,
+            });
+          } else if (option == 'Save') {
+            this._dbService.updateGridMenuButton(item.GridMenuButtonID, {
+              label: data.newLabel,
+              productId: item.OnClick_AddProductID,
+            });
+
+            this.refreshGridItems();
+          }
+        },
+        dismissable: false,
+      });
+    } else if (item.OnClick_OpenGridMenuID) {
+    } else if (item.OnClick_Script) {
+    } else {
+      // Blank tile
+      this._posService.triggerPrompt({
+        title: 'Modify Blank Tile',
+        description: 'What action do you want this tile to perform?',
+        type: 'basic',
+        options: ['Add Product', 'Open Submenu', 'Cancel'],
+        dismissable: true,
+        onOptionClick: (btnLbl, data) => {
+          if (btnLbl == 'Add Product') {
+            let allProducts = this._dbService
+              .getAllProducts()
+              .map((item) => item.Title);
+
+            this._posService.triggerPrompt({
+              type: 'list',
+              title: 'Tile Action: Add Product',
+              description: 'Select the product to add on click',
+              inputParams: {
+                listItems: allProducts,
+                items: this._dbService.getAllProducts(),
+                map: (item: DbProduct) => item.Title,
+              },
+              options: ['Cancel', 'Select'],
+              onOptionClick: (option: string, data: any): void => {
+                if (option == 'Select') {
+                  this.initializeAddProductGridItem(
+                    item,
+                    index,
+                    data.listItemSelection
+                  );
+                }
+              },
+              dismissable: true,
+            });
+            // Create this GridMenuButton, if doesn't exist
+            // Update the GridMenuButton
+          } else if (btnLbl == 'Open Submenu') {
+            // Create GridMenuButton at this position, if it doesn't exist
+
+            this._posService.triggerPrompt({
+              type: 'keyboard',
+              title: 'Tile Action: Open Submenu',
+              description: 'What should the menu be called?',
+              options: ['Cancel', 'Enter'],
+              onOptionClick: (option: string, data: any): void => {
+                if (option == 'Enter') {
+                  this.createSubmenuAndOpen(item, index, data.inputValue);
+                }
+              },
+              dismissable: true,
+            });
+
+            // Change onclick action of this GridMenuButton
+            // Refresh page so it appears as a submenu
+          }
+        },
+      });
+    }
+  }
+
+  private createSubmenuAndOpen(
+    item: DbGridMenuButton,
+    index: number,
+    name: string
+  ) {
+    if (item.GridMenuButtonID == -1) {
+      // Create gridmenu
+      let newGridMenuId = this._dbService.createGridMenu(
+        this.selectedGridMenuId
+      );
+
+      try {
+        this._dbService.createGridMenuButton({
+          GridMenuButtonID: -1,
+          GridMenuID: this.selectedGridMenuId,
+          ImageID: null,
+          Label: name,
+          X: item.X,
+          Y: item.Y,
+          W: 1,
+          H: 1,
+          OnClick_Script: null,
+          OnClick_OpenGridMenuID: newGridMenuId,
+          OnClick_AddProductID: null,
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          this.logger.warn('Could not create grid item due to a conflict.');
+        }
+      }
+
+      this.logger.info(
+        `Creating submenu - changing selected Grid Menu ID ${this.selectedGridMenuId} to ${newGridMenuId}`
+      );
+
+      this.selectedGridMenuId = newGridMenuId;
+
+      this.refreshGridItems();
+    }
+  }
+
+  initializeAddProductGridItem(
+    item: DbGridMenuButton,
+    index: number,
+    productName: string
+  ) {
+    let productInfo: DbProduct = this._dbService.getProductByName(productName);
+    if (item.GridMenuButtonID == -1) {
+      try {
+        this._dbService.createGridMenuButton({
+          GridMenuButtonID: -1,
+          GridMenuID: this.selectedGridMenuId,
+          ImageID: null,
+          Label: productName,
+          X: item.X,
+          Y: item.Y,
+          W: 1,
+          H: 1,
+          OnClick_Script: null,
+          OnClick_OpenGridMenuID: null,
+          OnClick_AddProductID: productInfo.ProductID,
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          this.logger.warn('Could not create grid item due to a conflict.');
+        }
+      }
+    }
+
+    this.refreshGridItems();
   }
 
   runScriptInSandbox(command: string) {}

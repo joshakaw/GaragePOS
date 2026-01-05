@@ -7,6 +7,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+/**
+ * Pass in array of items and how to map each entry to a string
+ * inputParams {items: Array<T>, map: (item: T): string => {...}}
+ */
 @Component({
   selector: 'app-list-prompt',
   imports: [CommonModule, FormsModule],
@@ -15,11 +19,13 @@ import { FormsModule } from '@angular/forms';
 })
 export class ListPromptComponent extends BasePrompt {
   @Input() params!: TriggerPromptParams;
+  inputParams: { items: Array<any>; map: (item: any) => string };
 
-  selection: string | undefined;
+  selection: any | undefined;
 
   constructor(private _posService: PosService) {
     super();
+    this.inputParams = { items: [], map: (item) => 'N/A' }; // Until params are set
 
     // const testParams: TriggerPromptParams = {
     //   title: "My Title",
@@ -34,7 +40,17 @@ export class ListPromptComponent extends BasePrompt {
   }
 
   protected override onOptionClicked(option: string): void {
-    let data = { listItemSelection: this.selection };
+    if (!this.selection) {
+      if (this.inputParams.items.length == 0) {
+        throw new Error('List prompt was supplied with no items.');
+      }
+      this.selection = this.inputParams.items[0];
+    }
+    
+    let data = {
+      listItemSelection: this.inputParams.map(this.selection),
+      itemSelection: this.selection,
+    };
 
     super.onOptionClicked(option, data);
     this.onDismissClicked();

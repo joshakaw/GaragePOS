@@ -56,23 +56,23 @@
                                 [routerLink]="['/grid']"
                 routerLinkActive="navigated"
                 [disabled]="promptActive">
-                    <div class="text" (click)="navigateConditional('grid')">
-                        Home
+                    <div class="text" (click)="navigateConditional('grid', false)">
+                        Quick Grid
                     </div>
                 </button>
-                <button class="footer-button footer-button-border-right" 
+                <!-- <button class="footer-button footer-button-border-right" 
                 [routerLink]="['/configure']"
                 routerLinkActive="navigated"
                 [disabled]="isActiveTransaction || promptActive">
                     <div class="text" (click)="navigateConditional('configure')">
                         Configure Grid
                     </div>
-                </button>
+                </button> -->
                 <button class="footer-button"
                                 [routerLink]="['/product']"
                 routerLinkActive="navigated"
-                    [disabled]="isActiveTransaction || promptActive">
-                    <div class="text" (click)="navigateConditional('product')">
+                    [disabled]="promptActive">
+                    <div class="text" (click)="navigateConditional('product', false)">
                         Products
                     </div>
                 </button>

@@ -2,8 +2,15 @@ export type DbProduct = {
   ProductID: number;
   Title: string;
   Price: number;
+  ProductGroupID: number,
   CreatedAt: string;
 };
+
+export type DbProductGroup = {
+  ProductGroupID: number,
+  Title: string,
+  CreatedAt: string
+}
 
 export type DbGridMenuButton = {
   GridMenuButtonID: number;

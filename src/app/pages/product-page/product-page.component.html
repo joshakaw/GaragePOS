@@ -1,11 +1,44 @@
-<div class="list-region" >    
-    <div class="button new" (click)="onNew()">
-        <div class="text">New</div>
+<div style="display:flex;flex-direction: column;height:100%">
+    <div style="flex-grow:1">
+        <div class="list-region">
+            <div class="button new" (click)="onNew()" *ngIf="configureMode">
+                <div class="text">New</div>
+            </div>
+            <div class="button item" *ngFor="let product of products" (click)="onClick(product)">
+                <div class="text">
+                    {{product.Title}}
+                    <div style="font-size: small">${{product.Price.toFixed(2)}}</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="button item" *ngFor="let product of products">
-        <div class="text">
-            {{product.Title}}
-            <div style="font-size: small">${{product.Price.toFixed(2)}}</div>
+
+    <!-- Function keys -->
+    <div style="display:flex;flex-direction: row;height:50px">
+        <div class="app-preset-grid-button-functions" (click)="onFilterByGroup()">
+            <div class="text">
+                Filter by Group
+            </div>
+        </div>
+        <div style="padding-left:10px">
+            <div
+                style="display: flex;justify-content: center;align-items: center;height: 100%;width: 100%;text-align: center;">
+                @if (currentFilter){
+                Filtered: {{currentFilter.Title}}
+                } @else {
+                Unfiltered
+                }
+            </div>
+
+        </div>
+        <div class="app-preset-grid-button-functions" style="margin-left:auto" (click)="onConfigure()" [hidden]="true">
+            <div class="text">
+                @if(!configureMode){
+                Configure
+                } @else {
+                Exit Configure
+                }
+            </div>
         </div>
     </div>
 </div>

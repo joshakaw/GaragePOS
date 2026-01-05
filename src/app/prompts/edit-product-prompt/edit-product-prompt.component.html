@@ -1,0 +1,25 @@
+<div class="prompt-container">
+    <div class="header">
+        <b>{{title}}</b>
+        <p>{{description}}</p>
+    </div>
+    <div>
+        This just displays. Prompt options allow edits.
+        <p>
+            Name: <b>Product Name</b>
+        </p>
+        <p>
+            Price: <b>$12.34</b>
+        </p>
+
+
+
+    </div>
+    <div style="padding:10px" class="button-region">
+        <div *ngFor="let button of options" (click)="onOptionClicked(button, null)" class="button">
+            <div class="text">
+                {{button}}
+            </div>
+        </div>
+    </div>
+</div>

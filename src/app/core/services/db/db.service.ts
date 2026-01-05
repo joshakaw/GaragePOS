@@ -5,6 +5,7 @@ import { ReceiptItem } from '../../../models/receipt-item.model';
 import {
   DbGridMenuButton,
   DbProduct,
+  DbProductGroup,
   ReservedProductId,
 } from '../../../models/db/product';
 import { NGXLogger } from 'ngx-logger';
@@ -51,12 +52,31 @@ export class DbService {
     this.db
       .prepare('INSERT OR IGNORE INTO GridMenu (GridMenuID) VALUES (1)')
       .run();
+
+    /*
+      A normal transaction should add up to zero. Since the receipt
+      takes the perspective of the customer, our loss-in-value departments
+      are 'positive' departments. And our gain-in-value departments
+      are 'negative' departments. 
+
+      Gain-in-Value (negative):
+        Cash
+        Pay In
+
+      Loss-in-Value (positive):
+        Change
+        Product
+        Pay Out
+        Lottery Redeem
+
+       */
+
     // Reserve system products (e.g. Pay In, Pay Out, Change)
 
     let systemProducts = [
-      { id: 10, title: 'Change' },
-      { id: 30, title: 'Pay In' },
-      { id: 35, title: 'Pay Out' },
+      { id: ReservedProductId.CashPaymentChange, title: 'Change' },
+      { id: ReservedProductId.PayIn, title: 'Pay In' },
+      { id: ReservedProductId.PayOut, title: 'Pay Out' },
     ];
 
     let insert = this.db.prepare(
@@ -227,10 +247,12 @@ export class DbService {
       .prepare(`INSERT INTO Product (Title, Price) VALUES (@Title, @Price)`)
       .run({
         Title: title,
-        Price: price
+        Price: price,
       });
 
-      this.logger.info("New product with ID " + result.lastInsertRowid + " was created.")
+    this.logger.info(
+      'New product with ID ' + result.lastInsertRowid + ' was created.'
+    );
     return result.lastInsertRowid as number;
   }
 
@@ -238,6 +260,21 @@ export class DbService {
     return this.db
       .prepare(`SELECT * FROM Product WHERE ProductId > 100 ORDER BY Title ASC`) // WHERE disincludes system products
       .all() as Array<DbProduct>;
+  }
+
+  getAllProductsInGroup(productGroupId: number | undefined): Array<DbProduct> {
+    let products = this.getAllProducts();
+    if(productGroupId){
+      return products.filter((item) => item.ProductGroupID == productGroupId)
+    } else {
+      return products;
+    }
+  }
+
+  getAllProductGroups(): Array<DbProductGroup> {
+    return this.db
+      .prepare(`SELECT * FROM ProductGroup ORDER BY Title ASC`)
+      .all() as Array<DbProductGroup>;
   }
 
   getProductByName(productName: string): DbProduct {

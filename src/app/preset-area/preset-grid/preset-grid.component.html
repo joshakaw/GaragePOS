@@ -1,16 +1,36 @@
-<div class="grid-container">
-  <!-- <app-preset-grid-button *ngFor="let item of gridItems" ></app-preset-grid-button> -->
-  <div class="app-preset-grid-button" *ngFor="let item of gridItems" (click)="handleGridItemClick(item)" [class.menu]="item.OnClick_OpenGridMenuID != null">
-    @if (item.Label != "\<BLANK>") {
-      <div class="text">
-        {{item.Label}}
-      </div>
-      }
-  </div>
-  <div class="app-preset-grid-button" (click)="goBack()" [hidden]="!hasParent">
-    <div class="text">
-      Back
+<div style="display:flex;flex-direction: column;height:100%">
+  <!-- Quick Grid keys -->
+  <div class="grid-container" style="flex-grow: 1;">
+    <!-- <app-preset-grid-button *ngFor="let item of gridItems" ></app-preset-grid-button> -->
+    <div class="app-preset-grid-button" *ngFor="let item of gridItems; let i = index"
+      (click)="handleGridItemClick(item, i)" [class.menu]="item.OnClick_OpenGridMenuID != null">
+      @if (item.Label != "\<BLANK>") {
+        <div class="text">
+          {{item.Label}}
+        </div>
+        }
+    </div>
+    <div>
+
     </div>
   </div>
-</div>
+  <!-- Function keys -->
+  <div style="display:flex;flex-direction: row;height:50px">
+    <div class="app-preset-grid-button-functions" (click)="goBack()" [hidden]="!hasParent">
+      <div class="text">
+        Back
+      </div>
+    </div>
+    <div class="app-preset-grid-button-functions" style="margin-left:auto" (click)="onConfigure()">
+      <div class="text">
+        @if(!configureMode){
+        Configure
+        } @else {
+        Exit Configure
+        }
 
+      </div>
+    </div>
+  </div>
+
+</div>

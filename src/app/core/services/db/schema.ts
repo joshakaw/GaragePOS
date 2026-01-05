@@ -1,4 +1,6 @@
 export const DB_SCHEMA = `
+-- 1/4/26
+-- Garage POS Schema
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS "Clerk" (
 	"ClerkID"	INT NOT NULL,
@@ -7,11 +9,17 @@ CREATE TABLE IF NOT EXISTS "Clerk" (
 	"CreatedAt"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY("ClerkID")
 ) STRICT;
+CREATE TABLE IF NOT EXISTS "Department" (
+	"DepartmentID"	INTEGER NOT NULL,
+	"Title"	TEXT,
+	"IsNegativeDepartment"	INTEGER NOT NULL DEFAULT 0 CHECK("IsNegativeDepartment" IN (0, 1)),
+	PRIMARY KEY("DepartmentID")
+);
 CREATE TABLE IF NOT EXISTS "GridMenu" (
-        "GridMenuID"    INTEGER NOT NULL,
-        "ParentGridMenuID"      INTEGER,
-        CONSTRAINT "GridMenu_PK" PRIMARY KEY("GridMenuID"),
-        FOREIGN KEY("ParentGridMenuID") REFERENCES "GridMenu"("GridMenuID") ON DELETE CASCADE ON UPDATE CASCADE
+	"GridMenuID"	INTEGER NOT NULL,
+	"ParentGridMenuID"	INTEGER,
+	CONSTRAINT "GridMenu_PK" PRIMARY KEY("GridMenuID"),
+	FOREIGN KEY("ParentGridMenuID") REFERENCES "GridMenu"("GridMenuID") ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "GridMenuButton" (
 	"GridMenuButtonID"	INTEGER NOT NULL,
@@ -42,9 +50,11 @@ CREATE TABLE IF NOT EXISTS "Product" (
 	"ProductID"	INTEGER NOT NULL,
 	"Title"	TEXT NOT NULL UNIQUE,
 	"Price"	REAL NOT NULL DEFAULT 0,
+	"DepartmentID"	INT,
 	"TaxRateID"	INT,
 	"CreatedAt"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT "Product_PK" PRIMARY KEY("ProductID"),
+	FOREIGN KEY("DepartmentID") REFERENCES "Department"("DepartmentID"),
 	FOREIGN KEY("TaxRateID") REFERENCES "TaxRate"("TaxRateID")
 ) STRICT;
 CREATE TABLE IF NOT EXISTS "TaxRate" (
@@ -62,7 +72,7 @@ CREATE TABLE IF NOT EXISTS "Transaction" (
 	PRIMARY KEY("TransactionID")
 ) STRICT;
 CREATE TABLE IF NOT EXISTS "TransactionDetail" (
-	"TransactionDetailID"	INT NOT NULL,
+	"TransactionDetailID"	INTEGER NOT NULL,
 	"TransactionID"	INT NOT NULL,
 	"ProductID"	INT NOT NULL,
 	"ProductTitle"	TEXT NOT NULL,

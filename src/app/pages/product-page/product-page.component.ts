@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DbProduct } from '../../models/db/product';
+import { DbProduct, DbProductGroup } from '../../models/db/product';
 import { DbService } from '../../core/services/db/db.service';
 import { CommonModule } from '@angular/common';
 import { PosService } from '../../core/services/pos/pos.service';
@@ -11,10 +11,71 @@ import { PosService } from '../../core/services/pos/pos.service';
   styleUrls: ['./product-page.component.scss', '../../shared.scss'],
 })
 export class ProductPageComponent {
-  products: Array<DbProduct>;
+  products: Array<DbProduct> = [];
+  configureMode: boolean = false;
+
+  currentFilter: DbProductGroup | undefined;
 
   constructor(private _dbService: DbService, private _posService: PosService) {
-    this.products = this._dbService.getAllProducts();
+    this.refreshProducts();
+  }
+
+  private refreshProducts() {
+    this.products = this._dbService.getAllProductsInGroup(
+      this.currentFilter?.ProductGroupID
+    );
+  }
+
+  onConfigure() {
+    this.configureMode = !this.configureMode;
+  }
+
+  onClick(product: DbProduct) {
+    if (!this.configureMode) {
+      this._posService.addItem(product);
+      return;
+    }
+
+    // Configure
+    this._posService.triggerPrompt({
+      type: 'edit-product',
+      title: 'Edit Product',
+      description: '(WIP) Not implemented',
+      options: ['Cancel'],
+      onOptionClick: function (option: string, data: any): void {
+        //throw new Error('Function not implemented.');
+      },
+      dismissable: false,
+    });
+  }
+
+  onFilterByGroup() {
+    this._posService.triggerPrompt({
+      type: 'list',
+      title: 'Filter by Group',
+      description: 'Select the group to filter by',
+      inputParams: {
+        listItems: this._dbService
+          .getAllProductGroups()
+          .map((item) => item.Title),
+        items: this._dbService.getAllProductGroups(),
+        map: (item: DbProductGroup) => item.Title,
+      },
+      options: ['Cancel', 'Clear Filters', 'Filter'],
+      onOptionClick: (
+        option: string,
+        data: { itemSelection: DbProductGroup }
+      ): void => {
+        if (option == 'Cancel') return;
+        else if (option == 'Clear Filters') {
+          this.currentFilter = undefined;
+        } else if (option == 'Filter') {
+          this.currentFilter = data.itemSelection;
+        }
+        this.refreshProducts();
+      },
+      dismissable: false,
+    });
   }
 
   onNew() {
@@ -34,10 +95,10 @@ export class ProductPageComponent {
           options: ['Cancel', 'Create Product'],
           onOptionClick: (option: string, data: { amount: number }): void => {
             if (option == 'Cancel') return;
-            let price = data.amount
+            let price = data.amount;
 
             let id = this._dbService.createProduct(title, price);
-            alert(id);
+            this.refreshProducts();
           },
           dismissable: false,
         });

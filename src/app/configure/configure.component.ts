@@ -131,7 +131,10 @@ export class ConfigureComponent implements OnInit {
               type: 'list',
               title: 'Tile Action: Add Product',
               description: 'Select the product to add on click',
-              inputParams: { listItems: allProducts },
+              inputParams: { listItems: allProducts,
+                items: this._dbService.getAllProducts(),
+                map: (item: DbProduct) => item.Title
+              },
               options: ['Cancel', 'Select'],
               onOptionClick: (option: string, data: any): void => {
                 if (option == 'Select') {

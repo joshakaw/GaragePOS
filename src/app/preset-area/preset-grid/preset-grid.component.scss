@@ -3,7 +3,7 @@
 .grid-container {
   display: grid;
   grid-template-columns: repeat(7, 1fr); /* 7 equal-width columns */
-  grid-template-rows: repeat(6, 1fr);    /* 6 equal-height rows */
+  grid-template-rows: repeat(5, 1fr);    /* 6 equal-height rows */
   gap: 8px;
 
   height:100%;
