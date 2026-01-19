@@ -1,0 +1,31 @@
+<div class="prompt-container">
+    <div class="header">
+        <b>{{title}}</b>
+        <p>{{description}}</p>
+    </div>
+    
+    <div class="table-region">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th *ngFor="let header of inputParams.header">{{header}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of inputParams.data">
+                    <td *ngFor="let cell of row">{{cell}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="padding:10px" class="button-region">
+        <div *ngFor="let button of options" 
+            (click)="onOptionClicked(button)"
+            class="button">
+            <div class="text">
+                {{button}}
+            </div>
+        </div>
+    </div>
+</div>

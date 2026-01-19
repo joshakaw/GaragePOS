@@ -1,1 +1,46 @@
-<p>report-page works!</p>
+<div style="display:flex;flex-direction: column;height:100%">
+    <div style="flex-grow:1">
+        <div class="list-region">
+            <!-- <div class="button new">
+                <div class="text">New SQL</div>
+            </div> -->
+            <div class="button item" *ngFor="let item of sqlReports" (click)="onClick(item)">
+                <div class="text">
+                    {{item.title}}
+                    @if (item.small){
+                        <div style="font-size: small">{{item.small}}</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Function keys -->
+    <div style="display:flex;flex-direction: row;height:50px">
+        <!-- <div class="app-preset-grid-button-functions" (click)="onFilterByGroup()">
+            <div class="text">
+                Filter by Group
+            </div>
+        </div>
+        <div style="padding-left:10px">
+            <div
+                style="display: flex;justify-content: center;align-items: center;height: 100%;width: 100%;text-align: center;">
+                @if (currentFilter){
+                Filtered: {{currentFilter.Title}}
+                } @else {
+                Unfiltered
+                }
+            </div>
+
+        </div> -->
+        <!-- <div class="app-preset-grid-button-functions" style="margin-left:auto" (click)="onConfigure()">
+            <div class="text">
+                @if(!configureMode){
+                Configure
+                } @else {
+                Exit Configure
+                }
+            </div>
+        </div> -->
+    </div>
+</div>

@@ -26,6 +26,12 @@ export class KeyboardPromptComponent extends BasePrompt {
     this.onDismissClicked();
   }
 
+    public setParams(params: TriggerPromptParams): void {
+      super.setParams(params);
+  
+      this.inputValue = this.inputParams.startingInputValue ?? ""
+    }
+
   protected override onDismissClicked(): void {
     this._posService.promptHandled();
   }

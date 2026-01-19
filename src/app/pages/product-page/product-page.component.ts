@@ -16,13 +16,16 @@ export class ProductPageComponent {
 
   currentFilter: DbProductGroup | undefined;
 
-  constructor(private _dbService: DbService, private _posService: PosService) {
+  constructor(
+    private _dbService: DbService,
+    private _posService: PosService,
+  ) {
     this.refreshProducts();
   }
 
   private refreshProducts() {
     this.products = this._dbService.getAllProductsInGroup(
-      this.currentFilter?.ProductGroupID
+      this.currentFilter?.ProductGroupID,
     );
   }
 
@@ -38,12 +41,90 @@ export class ProductPageComponent {
 
     // Configure
     this._posService.triggerPrompt({
-      type: 'edit-product',
+      type: 'list',
       title: 'Edit Product',
-      description: '(WIP) Not implemented',
-      options: ['Cancel'],
-      onOptionClick: function (option: string, data: any): void {
-        //throw new Error('Function not implemented.');
+      description: 'Select a product property to modify:',
+      inputParams: {
+        items: [
+          { action: 'Title', current: `${product.Title}` },
+          { action: 'Price', current: `\$${product.Price.toFixed(2)}` },
+          {
+            action: 'Group',
+            current: `${this._dbService.getProductGroupTitle(product.ProductGroupID) ?? 'None'}`,
+          },
+        ],
+        map: (item: any) => item.action + ': ' + item.current,
+      },
+      options: ['Cancel', 'OK'],
+      onOptionClick: (option: string, data: any): void => {
+        if (option == 'Cancel') return;
+        if (data.itemSelection.action == 'Price') {
+          this._posService.triggerPrompt({
+            type: 'numeric',
+            title: 'Edit Product: Price',
+            description: 'What price should the product have instead?',
+            options: ['Cancel', 'Done'],
+            onOptionClick: (option: string, data: any) => {
+              if (option == 'Done') {
+                this._dbService.patchProduct(product.ProductID, {
+                  Price: data.amount,
+                });
+                this.refreshProducts();
+              }
+            },
+            dismissable: false,
+          });
+        } else if (data.itemSelection.action == 'Title') {
+          this._posService.triggerPrompt({
+            type: 'keyboard',
+            title: 'Edit Product: Title',
+            description: 'What title should the product have?',
+            options: ['Done', 'Cancel'],
+            inputParams: {
+              startingInputValue: product.Title,
+            },
+            onOptionClick: (option: string, data: any): void => {
+              if (option == 'Done') {
+                this._dbService.patchProduct(product.ProductID, {
+                  Title: data.inputValue,
+                });
+                this.refreshProducts();
+              }
+            },
+            dismissable: false,
+          });
+        } else if (data.itemSelection.action == 'Group') {
+          this._posService.triggerPrompt({
+            type: 'list',
+            title: 'Edit Product: Group',
+            description: 'What group is the product in?',
+            options: ['Cancel', 'Set'],
+            inputParams: {
+              items: [
+                { ProductGroupID: null, Title: '* None' },
+                // TODO: Add New Group functionality
+                //{ ProductGroupID: -98, Title: '* Add New Group' },
+                ...this._dbService.getAllProductGroups(),
+              ] as Array<DbProductGroup>,
+              map: (item: DbProductGroup) => item.Title,
+            },
+            onOptionClick: (
+              option: string,
+              data: { itemSelection: DbProductGroup },
+            ): void => {
+              if (data.itemSelection.ProductGroupID == -98) {
+                // Add New Group
+                return;
+              }
+              this._dbService.patchProduct(product.ProductID, {
+                ProductGroupID: data.itemSelection.ProductGroupID,
+              });
+
+              this.refreshProducts();
+            },
+            dismissable: false,
+          });
+        }
       },
       dismissable: false,
     });
@@ -64,7 +145,7 @@ export class ProductPageComponent {
       options: ['Cancel', 'Clear Filters', 'Filter'],
       onOptionClick: (
         option: string,
-        data: { itemSelection: DbProductGroup }
+        data: { itemSelection: DbProductGroup },
       ): void => {
         if (option == 'Cancel') return;
         else if (option == 'Clear Filters') {
@@ -83,6 +164,9 @@ export class ProductPageComponent {
       type: 'keyboard',
       title: 'Create a New Product',
       description: 'What title should it have?',
+      inputParams: {
+        startingInputValue: '',
+      },
       options: ['Cancel', 'Continue'],
       onOptionClick: (option: string, data: { inputValue: string }): void => {
         if (option == 'Cancel') return;

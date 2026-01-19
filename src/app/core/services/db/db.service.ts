@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Database } from 'better-sqlite3';
+import { Database, Statement } from 'better-sqlite3';
 import { DB_SCHEMA } from './schema';
 import { ReceiptItem } from '../../../models/receipt-item.model';
 import {
@@ -15,14 +15,14 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class DbService {
   db: Database;
-
+  
   constructor(private logger: NGXLogger) {
     console.log(window.require);
     if (typeof window.require == 'undefined') {
       throw new Error(
         'DbService cannot be ran on a web browser. ' +
           'The better-sqlite3 package is needed from the ' +
-          "Electron main process, which doesn't run on browser."
+          "Electron main process, which doesn't run on browser.",
       );
     }
 
@@ -44,7 +44,7 @@ export class DbService {
     // Add default clerk
     this.db
       .prepare(
-        "INSERT OR IGNORE INTO Clerk (ClerkID, FirstName, LastName) VALUES (1, 'Admin', 'User')"
+        "INSERT OR IGNORE INTO Clerk (ClerkID, FirstName, LastName) VALUES (1, 'Admin', 'User')",
       )
       .run();
 
@@ -80,7 +80,7 @@ export class DbService {
     ];
 
     let insert = this.db.prepare(
-      'INSERT OR IGNORE INTO Product (ProductID, Title, Price) VALUES (?, ?, ?)'
+      'INSERT OR IGNORE INTO Product (ProductID, Title, Price) VALUES (?, ?, ?)',
     );
 
     let insertProducts = this.db.transaction(() => {
@@ -94,6 +94,69 @@ export class DbService {
     });
 
     insertProducts();
+  }
+
+  /**
+   * @deprecated
+   * @param original Original object
+   * @param patch List of key-value patches to apply to object
+   * @returns Original object with patched values
+   */
+  private patch(original: any, patch: any): any {
+    let patchKeys = Object.keys(patch);
+    for (let patchKey of patchKeys) {
+      // TODO: Check that key exists
+      // TODO: Type this method's inputs and outputs
+      original[patchKey] = patch[patchKey];
+    }
+
+    return original;
+  }
+
+    execSql(sql: string): { header: Array<string>; data: Array<Array<string>> } {
+    const stmt = this.db.prepare(sql);
+    const rows = stmt.all() as Array<any>;
+
+    // Get column names from the statement
+    const header = stmt.columns().map((col: any) => col.name);
+
+    // Convert rows to array of arrays of strings
+    const data = rows.map((row) =>
+      header.map((colName) => String(row[colName])),
+    );
+
+    return { header, data };
+  }
+  
+  // Apply partial updates to a table record
+  private dbPatch(
+    table: string,
+    where: string,
+    patches: Record<string, any>,
+  ): void {
+    let patchKeys = Object.keys(patches);
+    let changeCount = 0;
+    for (let patchKey of patchKeys) {
+      let result = this.db
+        .prepare(
+          `UPDATE ${table} SET ${patchKey} = @PatchValue WHERE ${where};`,
+        )
+        .run({
+          PatchValue: patches[patchKey],
+        });
+
+      changeCount += result.changes;
+    }
+
+    if (changeCount != patchKeys.length) {
+      this.logger.warn(
+        `Count of changes to table ${table} did not match count of patch items where ${where}. `,
+      );
+    } else {
+      this.logger.info(
+        `Table '${table}' was successfully patched where ${where}`,
+      );
+    }
   }
 
   getGridItems(id: number): Array<DbGridMenuButton> {
@@ -114,7 +177,7 @@ export class DbService {
       ParentGridMenuID: number;
       GridMenuID: number;
     };
-
+    
     return gridMenu.ParentGridMenuID;
   }
 
@@ -126,7 +189,7 @@ export class DbService {
       .prepare(
         `
       INSERT INTO GridMenu (ParentGridMenuID) VALUES (@ParentGridMenuID);
-      `
+      `,
       )
       .run({ ParentGridMenuID: parentGridMenuId });
 
@@ -157,13 +220,14 @@ export class DbService {
           OR (Y + H - 1) < @Y        -- existing bottom < new top
           OR Y > (@Y + @H - 1)       -- existing top > new bottom
         )
-      `
-      )
-      .get(obj) as { id: number };
+      `,
+    )
+    .get(obj) as { id: number };
 
     if (conflict) {
       throw new Error(
-        'Cannot create grid item - conflicts with GridMenuItemID ' + conflict.id
+        'Cannot create grid item - conflicts with GridMenuItemID ' +
+          conflict.id,
       );
     }
 
@@ -175,7 +239,7 @@ export class DbService {
       INSERT INTO GridMenuButton
       (GridMenuID, ImageID, Label, X, Y, W, H, OnClick_Script, OnClick_OpenGridMenuID, OnClick_AddProductID)
       VALUES(@GridMenuID, @ImageID, @Label, @X, @Y, @W, @H, @OnClick_Script, @OnClick_OpenGridMenuID, @OnClick_AddProductID);
-      `
+      `,
       )
       .run(obj);
 
@@ -189,19 +253,19 @@ export class DbService {
     obj: {
       label: string;
       productId: number | null;
-    }
+    },
   ) {
     let result = this.db
       .prepare(
         `UPDATE "GridMenuButton"
         SET Label = ?,
         OnClick_AddProductID = ?
-        WHERE "GridMenuButton".GridMenuButtonID = ?`
+        WHERE "GridMenuButton".GridMenuButtonID = ?`,
       )
       .run(obj.label, obj.productId, id);
 
-    if (result.changes != 1) {
-      throw new Error('Grid menu button update did not occur.');
+      if (result.changes != 1) {
+        throw new Error('Grid menu button update did not occur.');
     }
 
     return;
@@ -209,11 +273,11 @@ export class DbService {
 
   deleteGridMenuButton(
     gridMenuButtonId: number,
-    submenuGridMenuId: number | null
+    submenuGridMenuId: number | null,
   ) {
     let result = this.db
       .prepare(
-        `DELETE FROM GridMenuButton WHERE GridMenuButtonID = @GridMenuButtonID`
+        `DELETE FROM GridMenuButton WHERE GridMenuButtonID = @GridMenuButtonID`,
       )
       .run({
         GridMenuButtonID: gridMenuButtonId,
@@ -229,7 +293,7 @@ export class DbService {
 
       if (submenuResult.changes == 1) {
         this.logger.info(
-          'Successfully deleted submenu. (fyi - there is a cascade delete for its buttons and submenus.)'
+          'Successfully deleted submenu. (fyi - there is a cascade delete for its buttons and submenus.)',
         );
       }
     }
@@ -251,9 +315,13 @@ export class DbService {
       });
 
     this.logger.info(
-      'New product with ID ' + result.lastInsertRowid + ' was created.'
+      'New product with ID ' + result.lastInsertRowid + ' was created.',
     );
     return result.lastInsertRowid as number;
+  }
+
+  patchProduct(id: number, patches: Record<string, any>) {
+    this.dbPatch('Product', 'ProductID = ' + id, patches);
   }
 
   getAllProducts(): Array<DbProduct> {
@@ -264,8 +332,8 @@ export class DbService {
 
   getAllProductsInGroup(productGroupId: number | undefined): Array<DbProduct> {
     let products = this.getAllProducts();
-    if(productGroupId){
-      return products.filter((item) => item.ProductGroupID == productGroupId)
+    if (productGroupId) {
+      return products.filter((item) => item.ProductGroupID == productGroupId);
     } else {
       return products;
     }
@@ -275,6 +343,18 @@ export class DbService {
     return this.db
       .prepare(`SELECT * FROM ProductGroup ORDER BY Title ASC`)
       .all() as Array<DbProductGroup>;
+  }
+
+  getProductGroupTitle(productGroupId: number) {
+    var productGroup = this.db
+      .prepare(
+        'SELECT Title FROM ProductGroup WHERE ProductGroupID = @ProductGroupID',
+      )
+      .get({ ProductGroupID: productGroupId }) as {
+      Title: string;
+    } | null;
+
+    return productGroup?.Title ?? null;
   }
 
   getProductByName(productName: string): DbProduct {
@@ -345,13 +425,13 @@ export class DbService {
         SET TimeEnded = @TimeEnded,
             IsVoided = @IsVoided
         WHERE TransactionID = @TransactionID
-        `
+        `,
       )
       .run(obj);
 
     if (result.changes != 1) {
       this.logger.error(
-        `Transaction (ID ${transactionId}) could not be closed with the current time.`
+        `Transaction (ID ${transactionId}) could not be closed with the current time.`,
       );
     }
     return;
@@ -369,7 +449,7 @@ export class DbService {
 
     let result = this.db
       .prepare(
-        `INSERT INTO "TransactionDetail" (TransactionID, ProductID, ProductTitle, Quantity, UnitPrice, IsUnitPriceOverriden) VALUES (?, ?, ?, ?, ?, ?)`
+        `INSERT INTO "TransactionDetail" (TransactionID, ProductID, ProductTitle, Quantity, UnitPrice, IsUnitPriceOverriden) VALUES (?, ?, ?, ?, ?, ?)`,
       )
       .run(
         transactionId,
@@ -377,7 +457,7 @@ export class DbService {
         itemJson.productTitle,
         itemJson.quantity,
         itemJson.unitPrice,
-        itemJson.isPriceOverriden ? 1 : 0 // SQLite doesn't have boolean type
+        itemJson.isPriceOverriden ? 1 : 0, // SQLite doesn't have boolean type
       );
 
     return result.lastInsertRowid as number;

@@ -21,6 +21,20 @@
     margin-left: 10px;
 }
 
+.prompt-container .field-display {
+  border: 1px solid #DDD;
+  margin: 10px;
+  padding: 10px;
+  font-size: 1.5em;
+  text-align: right;
+  background-color: #f9f9f9;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 400px;
+}
+
 $field-width: 400px;
 
 .prompt-container .field-display {
@@ -103,4 +117,55 @@ $field-width: 400px;
 
 .prompt-container .list-region .button:hover {
   background-color: lighten($primary, 40%);
+}
+
+/* Table prompt styles */
+.prompt-container .table-region {
+  display: flex;
+  flex-direction: column;
+  max-height: 240px;
+  overflow: auto;
+  margin: 10px;
+  border: 1px solid #DDD;
+  box-sizing: border-box;
+}
+
+.prompt-container .data-table {
+  border-collapse: collapse;
+  width: auto;
+  font-size: 0.9em;
+  table-layout: auto;
+}
+
+.prompt-container .data-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #EEE;
+  border-bottom: 2px solid #DDD;
+}
+
+.prompt-container .data-table th {
+  padding: 8px;
+  text-align: left;
+  border-right: 1px solid #DDD;
+  font-weight: bold;
+}
+
+.prompt-container .data-table th:last-child {
+  border-right: none;
+}
+
+.prompt-container .data-table td {
+  padding: 8px;
+  border-right: 1px solid #DDD;
+  border-bottom: 1px solid #EEE;
+  white-space: nowrap;
+}
+
+.prompt-container .data-table td:last-child {
+  border-right: none;
+}
+
+.prompt-container .data-table tbody tr:hover {
+  background-color: lighten($primary, 45%);
 }

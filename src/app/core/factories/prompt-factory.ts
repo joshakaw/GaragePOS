@@ -5,6 +5,7 @@ import { ListPromptComponent } from '../../prompts/list-prompt/list-prompt.compo
 import { KeyboardPromptComponent } from '../../prompts/keyboard-prompt/keyboard-prompt.component';
 import { EditTilePromptComponent } from '../../prompts/edit-tile-prompt/edit-tile-prompt.component';
 import { EditProductPromptComponent } from '../../prompts/edit-product-prompt/edit-product-prompt.component';
+import { TablePromptComponent } from '../../prompts/table-prompt/table-prompt.component';
 
 // TODO: Move this class to /prompts folder
 
@@ -23,7 +24,8 @@ export type PromptTypeOptions =
   | 'list'
   | 'keyboard'
   | 'edit-tile'
-  | 'edit-product';
+  | 'edit-product'
+  | 'table';
 
 export class PromptFactory {
   /**
@@ -45,6 +47,8 @@ export class PromptFactory {
         return EditTilePromptComponent;
       case 'edit-product':
         return EditProductPromptComponent;
+      case 'table':
+        return TablePromptComponent;
       default:
         throw new Error('Prompt component not found.');
     }
