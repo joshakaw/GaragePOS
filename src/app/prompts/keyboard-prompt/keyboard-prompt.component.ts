@@ -15,22 +15,25 @@ import { FormsModule } from '@angular/forms';
 })
 export class KeyboardPromptComponent extends BasePrompt {
   @Input() params!: TriggerPromptParams;
-  inputValue: string = "";
+  inputValue: string = '';
 
   constructor(private _posService: PosService) {
     super();
   }
 
-  protected override onOptionClicked(option: string, data?: {inputValue: string}): void {
+  protected override onOptionClicked(
+    option: string,
+    data?: { inputValue: string },
+  ): void {
     super.onOptionClicked(option, data);
     this.onDismissClicked();
   }
 
-    public setParams(params: TriggerPromptParams): void {
-      super.setParams(params);
-  
-      this.inputValue = this.inputParams.startingInputValue ?? ""
-    }
+  public setParams(params: TriggerPromptParams): void {
+    super.setParams(params);
+
+    this.inputValue = this.inputParams.startingInputValue ?? '';
+  }
 
   protected override onDismissClicked(): void {
     this._posService.promptHandled();

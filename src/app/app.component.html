@@ -52,10 +52,8 @@
       } -->
 
             <div class="function-deck">
-                <button class="footer-button footer-button-border-right"
-                                [routerLink]="['/grid']"
-                routerLinkActive="navigated"
-                [disabled]="promptActive">
+                <button class="footer-button footer-button-border-right" [routerLink]="['/grid']"
+                    routerLinkActive="navigated" [disabled]="promptActive">
                     <div class="text" (click)="navigateConditional('grid', false)">
                         Quick Grid
                     </div>
@@ -68,18 +66,14 @@
                         Configure Grid
                     </div>
                 </button> -->
-                <button class="footer-button"
-                                [routerLink]="['/product']"
-                routerLinkActive="navigated"
-                    [disabled]="promptActive">
+                <button class="footer-button footer-button-border-right" [routerLink]="['/product']"
+                    routerLinkActive="navigated" [disabled]="promptActive">
                     <div class="text" (click)="navigateConditional('product', false)">
                         Products
                     </div>
                 </button>
-                <button class="footer-button"
-                                [routerLink]="['/report']"
-                routerLinkActive="navigated"
-                [disabled]="isActiveTransaction || promptActive">
+                <button class="footer-button" [routerLink]="['/report']" routerLinkActive="navigated"
+                    [disabled]="isActiveTransaction || promptActive">
                     <div class="text" (click)="navigateConditional('report', true)">
                         Reports
                     </div>
@@ -112,8 +106,12 @@
                 <div class="text">Pay Cash</div>
             </button>
             <button class="footer-button-mod" (click)="onVoidTransaction()" [disabled]="!isActiveTransaction">
+                <div class="text">Void Trans.</div>
+            </button>
+            <button class="footer-button-mod" (click)="onCashbox()" [disabled]="isActiveTransaction || promptActive">
                 <div class="text">
-                    Void Trans.
+                    ${{cashboxAmount.toFixed(2)}}<br>
+                    In Cashbox
                 </div>
             </button>
             <!-- <div class="footer-button" style="width: 100%">

@@ -39,14 +39,16 @@ export class ListPromptComponent extends BasePrompt {
     // this.setParams(testParams);
   }
 
-  protected override onOptionClicked(option: string): void {
-    if (!this.selection) {
-      if (this.inputParams.items.length == 0) {
-        throw new Error('List prompt was supplied with no items.');
-      }
-      this.selection = this.inputParams.items[0];
-    }
+  public setParams(params: TriggerPromptParams): void {
+    super.setParams(params);
     
+    if (this.inputParams.items.length == 0) {
+      throw new Error('List prompt was supplied with no items.');
+    }
+    this.selection = this.inputParams.items[0];
+  }
+
+  protected override onOptionClicked(option: string): void {
     let data = {
       listItemSelection: this.inputParams.map(this.selection),
       itemSelection: this.selection,

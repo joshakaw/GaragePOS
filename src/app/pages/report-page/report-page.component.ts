@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { DbService } from '../../core/services/db/db.service';
 import { PosService } from '../../core/services/pos/pos.service';
+import { SqlQueries } from '../../models/queries';
 
 @Component({
   selector: 'app-report-page',
@@ -30,6 +31,7 @@ FROM \`Transaction\` t
 JOIN TransactionDetail td ON t.TransactionID = td.TransactionID
 WHERE DATE(t.TimeEnded) >= DATE('now', '-1 month')
     AND t.TimeEnded IS NOT NULL
+    AND td.ProductID > 100
 GROUP BY DATE(t.TimeEnded)
 ORDER BY DATE(t.TimeEnded) DESC;`,
     },
@@ -49,26 +51,19 @@ JOIN \`Transaction\` t ON td.TransactionID = t.TransactionID
 WHERE DATE(t.TimeEnded) = DATE('now')
     AND t.IsVoided = 0
     AND t.TimeEnded IS NOT NULL
+    AND td.ProductID > 100
 GROUP BY p.ProductID, p.Title
 ORDER BY TotalRevenue DESC
 LIMIT 20;`,
     },
     {
-      title: 'Cash In Drawer',
+      title: 'Cash In Possession',
       // Uncomment once PayIn/PayOut is implemented
-      // description: 'Note: If amount after count is incorrect, correct with a Pay In / Pay Out.',
-      sql: `SELECT 
-    SUM(CASE 
-        WHEN td.ProductID = 40 THEN td.Quantity * td.UnitPrice  -- Pay In
-        WHEN td.ProductID = 45 THEN td.Quantity * td.UnitPrice * -1  -- Pay Out (negative)
-        WHEN td.ProductID = 20 THEN td.Quantity * td.UnitPrice  -- Cash Payment
-        WHEN td.ProductID = 21 THEN td.Quantity * td.UnitPrice * -1  -- Cash Change (negative)
-        ELSE 0 
-    END) * -1 as CurrentCashBalance
-FROM TransactionDetail td
-JOIN \`Transaction\` t ON td.TransactionID = t.TransactionID
-WHERE t.IsVoided = 0
-    AND t.TimeEnded IS NOT NULL;`,
+      // description:
+      //   'Amount in cashbox used to collect sales and make change. ' +
+      //   'An inaccurate amount indicates clerk error. ' +
+      //   'To make accurate, perform a Pay In or Pay Out.',
+      sql: SqlQueries.CashInPossession,
     },
   ];
 

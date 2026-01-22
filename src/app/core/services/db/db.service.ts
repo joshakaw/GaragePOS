@@ -9,13 +9,14 @@ import {
   ReservedProductId,
 } from '../../../models/db/product';
 import { NGXLogger } from 'ngx-logger';
+import { SqlQueries } from '../../../models/queries';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DbService {
   db: Database;
-  
+
   constructor(private logger: NGXLogger) {
     console.log(window.require);
     if (typeof window.require == 'undefined') {
@@ -113,7 +114,7 @@ export class DbService {
     return original;
   }
 
-    execSql(sql: string): { header: Array<string>; data: Array<Array<string>> } {
+  execSql(sql: string): { header: Array<string>; data: Array<Array<string>> } {
     const stmt = this.db.prepare(sql);
     const rows = stmt.all() as Array<any>;
 
@@ -127,7 +128,11 @@ export class DbService {
 
     return { header, data };
   }
-  
+
+  getCashboxAmount(): number {
+    return +this.execSql(SqlQueries.CashInPossession).data[0][0];
+  }
+
   // Apply partial updates to a table record
   private dbPatch(
     table: string,
@@ -177,7 +182,7 @@ export class DbService {
       ParentGridMenuID: number;
       GridMenuID: number;
     };
-    
+
     return gridMenu.ParentGridMenuID;
   }
 
@@ -221,8 +226,8 @@ export class DbService {
           OR Y > (@Y + @H - 1)       -- existing top > new bottom
         )
       `,
-    )
-    .get(obj) as { id: number };
+      )
+      .get(obj) as { id: number };
 
     if (conflict) {
       throw new Error(
@@ -264,8 +269,8 @@ export class DbService {
       )
       .run(obj.label, obj.productId, id);
 
-      if (result.changes != 1) {
-        throw new Error('Grid menu button update did not occur.');
+    if (result.changes != 1) {
+      throw new Error('Grid menu button update did not occur.');
     }
 
     return;
@@ -345,7 +350,8 @@ export class DbService {
       .all() as Array<DbProductGroup>;
   }
 
-  getProductGroupTitle(productGroupId: number) {
+  getProductGroupTitle(productGroupId: number | null) {
+    if (!productGroupId) return null;
     var productGroup = this.db
       .prepare(
         'SELECT Title FROM ProductGroup WHERE ProductGroupID = @ProductGroupID',

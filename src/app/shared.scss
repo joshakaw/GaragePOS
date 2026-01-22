@@ -1,28 +1,28 @@
 @import "styles.scss";
 
 .prompt-container {
-    border:0px solid gray;
-    height:100%;
+  border: 0px solid gray;
+  height: 100%;
 }
 
 .prompt-container .header {
-    background-color: #EEE;
-    border-bottom: 1px solid #DDD;
-    padding-top: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 3px;
-    margin-bottom: 20px;
+  background-color: #eee;
+  border-bottom: 1px solid #ddd;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 3px;
+  margin-bottom: 20px;
 }
 
 .prompt-container .button-region {
-    display: flex;
-    flex-direction: row;
-    margin-left: 10px;
+  display: flex;
+  flex-direction: row;
+  margin-left: 10px;
 }
 
 .prompt-container .field-display {
-  border: 1px solid #DDD;
+  border: 1px solid #ddd;
   margin: 10px;
   padding: 10px;
   font-size: 1.5em;
@@ -38,7 +38,7 @@
 $field-width: 400px;
 
 .prompt-container .field-display {
-  border: 1px solid #DDD;
+  border: 1px solid #ddd;
   margin: 10px;
   padding: 10px;
   font-size: 1.5em;
@@ -52,19 +52,48 @@ $field-width: 400px;
 
 .prompt-container .button {
   flex: 1;
-  height: 80px;
+  height: 70px;
   cursor: pointer;
   user-select: none;
-  border: 1px solid #DDD;
-  margin-right:10px;
+  margin-right: 10px;
+
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(255, 255, 255, 0.06) 30%
+    ),
+    linear-gradient(180deg, #f5f5f5, #d9d9d9);
+
+  color: Black;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.prompt-container .button.active {
+  color: white;
+  border-color: darken($primary, 7%);
+
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(255, 255, 255, 0.06) 30%
+    ),
+    linear-gradient(180deg, lighten($primary, 16%), $primary);
+}
+
+.prompt-container .button.active .text {
+  text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.6);
 }
 
 .prompt-container .button-border-right {
-  border-right: 1px solid #DDD;
+  border-right: 1px solid #ddd;
 }
 
 .prompt-container .button:hover {
-  background-color: #DDD;
+  background-color: #ddd;
 }
 
 .prompt-container .button:active {
@@ -74,8 +103,8 @@ $field-width: 400px;
 .prompt-container .button .text {
   display: flex;
   justify-content: center; /* horizontal */
-  align-items: center;     /* vertical */
-  height: 100%;            /* ensure it takes full height */
+  align-items: center; /* vertical */
+  height: 100%; /* ensure it takes full height */
   width: 100%;
   text-align: center;
 }
@@ -85,7 +114,7 @@ $field-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 240px; /* conservative height so buttons below stay visible */
+  //max-height: 240px; /* conservative height so buttons below stay visible */
   overflow-y: auto;
   overflow-x: hidden; /* prevent horizontal scrollbar */
   -webkit-overflow-scrolling: touch;
@@ -109,12 +138,6 @@ $field-width: 400px;
   text-align: left;
 }
 
-.prompt-container .list-region .button.selected {
-  background-color: $primary;
-  color: #fff;
-  border-color: darken($primary, 7%);
-}
-
 .prompt-container .list-region .button:hover {
   background-color: lighten($primary, 40%);
 }
@@ -126,7 +149,7 @@ $field-width: 400px;
   max-height: 240px;
   overflow: auto;
   margin: 10px;
-  border: 1px solid #DDD;
+  border: 1px solid #ddd;
   box-sizing: border-box;
 }
 
@@ -140,14 +163,14 @@ $field-width: 400px;
 .prompt-container .data-table thead {
   position: sticky;
   top: 0;
-  background-color: #EEE;
-  border-bottom: 2px solid #DDD;
+  background-color: #eee;
+  border-bottom: 2px solid #ddd;
 }
 
 .prompt-container .data-table th {
   padding: 8px;
   text-align: left;
-  border-right: 1px solid #DDD;
+  border-right: 1px solid #ddd;
   font-weight: bold;
 }
 
@@ -157,8 +180,8 @@ $field-width: 400px;
 
 .prompt-container .data-table td {
   padding: 8px;
-  border-right: 1px solid #DDD;
-  border-bottom: 1px solid #EEE;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #eee;
   white-space: nowrap;
 }
 

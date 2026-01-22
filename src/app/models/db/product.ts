@@ -2,7 +2,7 @@ export type DbProduct = {
   ProductID: number;
   Title: string;
   Price: number;
-  ProductGroupID: number,
+  ProductGroupID: number | null,
   CreatedAt: string;
 };
 
@@ -91,4 +91,11 @@ export enum ReservedProductId {
    * (e.g. cash removed from register)
    */
   PayOut = 45,
+
+  /**
+   * A Pay In/Pay Out (can be either
+   * negative or positive) to make the cashbox
+   * amount accurate.
+   */
+  CashboxAdjustment = 50
 }

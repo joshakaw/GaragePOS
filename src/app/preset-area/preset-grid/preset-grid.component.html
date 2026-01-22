@@ -21,16 +21,29 @@
         Back
       </div>
     </div>
-    <div class="app-preset-grid-button-functions" style="margin-left:auto" (click)="onConfigure()">
-      <div class="text">
-        @if(!configureMode){
-        Configure
-        } @else {
-        Exit Configure
-        }
+    <div style="display:flex;margin-left:auto">
+      <!-- <div class="app-preset-grid-button-functions" style="margin-right:8px">
+        <div class="text">
+          Pay In
+        </div>
+      </div>
+            <div class="app-preset-grid-button-functions" style="margin-right:8px">
+        <div class="text">
+          Pay Out
+        </div>
+      </div> -->
+      <div class="app-preset-grid-button-functions" (click)="onConfigure()">
+        <div class="text">
+          @if(!configureMode){
+          Configure
+          } @else {
+          Exit Configure
+          }
 
+        </div>
       </div>
     </div>
+
   </div>
 
 </div>

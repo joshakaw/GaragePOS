@@ -1,13 +1,13 @@
-<div class="prompt-container">
+<div class="prompt-container" style="display:flex;flex-direction: column;">
     <div class="header">
         <b>{{title}}</b>
         <p>{{description}}</p>
     </div>
-    <div class="list-region">
+    <div class="list-region" style="flex:1">
         <div *ngFor="let listItem of inputParams.items"
             (click)="selection = listItem"
-            [class.selected]="selection === listItem"
-            class="button list-item">
+            [class.active]="selection === listItem"
+            class="button" style="max-height:80px">
             <div class="text">
                 {{inputParams.map(listItem)}}
             </div>
@@ -16,7 +16,7 @@
     <div style="padding:10px" class="button-region">
         <div *ngFor="let button of options" 
             (click)="onOptionClicked(button)"
-            class="button">
+            class="button active">
             <div class="text">
                 {{button}}
             </div>

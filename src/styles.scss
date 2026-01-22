@@ -2,13 +2,13 @@
 
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
-
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 
   height: 100%;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 18px;
 }
 
@@ -47,14 +47,13 @@ $primary: #0343a3;
       background: #fff;
       color: #ed3330 !important;
       letter-spacing: 1px;
-      -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
-      -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
-      box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
+      -webkit-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+      -moz-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+      box-shadow: 5px 40px -10px rgba(0, 0, 0, 0.57);
       transition: all 0.4s ease 0s;
     }
   }
 }
-
 
 .app-preset-grid-button-functions {
   width: 100px;
@@ -62,9 +61,10 @@ $primary: #0343a3;
   color: white;
   cursor: pointer;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  border: 1px solid rgba(0,0,0,0.06);
-    background-image: linear-gradient(
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background-image:
+    linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.25) 0%,
       rgba(255, 255, 255, 0.06) 30%
@@ -74,9 +74,9 @@ $primary: #0343a3;
 .app-preset-grid-button-functions .text {
   display: flex;
   justify-content: center; /* horizontal */
-  align-items: center;     /* vertical */
-  height: 100%;            /* ensure it takes full height */
+  align-items: center; /* vertical */
+  height: 100%; /* ensure it takes full height */
   width: 100%;
   text-align: center;
-    text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.6);
+  text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.6);
 }

@@ -22,7 +22,12 @@ import {
   DbProduct,
   ReservedProductId,
 } from './models/db/product';
-import { Router, RouterOutlet, RouterLinkWithHref, RouterLinkActive } from '@angular/router';
+import {
+  Router,
+  RouterOutlet,
+  RouterLinkWithHref,
+  RouterLinkActive,
+} from '@angular/router';
 import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ConfigureComponent } from './configure/configure.component';
@@ -41,8 +46,8 @@ import { APP_CONFIG } from '../environments/environment';
     CommonModule,
     RouterOutlet,
     RouterLinkWithHref,
-    RouterLinkActive
-],
+    RouterLinkActive,
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
@@ -62,6 +67,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   /** ID of current Transaction being tracked. */
   protected currentTransactionId: number | null = null;
+
+  protected cashboxAmount: number;
 
   /** Configuration mode */
   //protected configureActive = false;
@@ -84,7 +91,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private _transactionService: TransactionService,
     private _router: Router,
     private electronService: ElectronService,
-    private translate: TranslateService
+    private translate: TranslateService,
   ) {
     this.translate.setDefaultLang('en');
     console.log('APP_CONFIG', APP_CONFIG);
@@ -97,6 +104,7 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       console.log('Run in browser');
     }
+    this.cashboxAmount = this._dbService.getCashboxAmount();
 
     _posService.prompt$.pipe(takeUntilDestroyed()).subscribe((params) => {
       // Clear any previous prompt
@@ -177,7 +185,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.items[this.selectedItemIndex!].quantity = 0;
     this._dbService.addTransactionDetail(
       this.items[this.selectedItemIndex!],
-      this.currentTransactionId!
+      this.currentTransactionId!,
     );
 
     // Remove the item from local array
@@ -204,7 +212,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     this.items.push(
-      this._transactionService.createReceiptItem(product.ProductID)
+      this._transactionService.createReceiptItem(product.ProductID),
     );
 
     this.receiptViewer.selectedItemIndex = null;
@@ -212,6 +220,114 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onVoidTransaction() {
     this.closePayment(true);
+  }
+
+  onCashbox() {
+    // List prompt
+    // options: Pay In, Pay Out, Count Drawer
+    //
+    if (this.currentTransactionId || this.promptActive) {
+      return;
+    }
+    this._posService.triggerPrompt({
+      type: 'list',
+      title: 'Manage Cashbox',
+      description: 'Select an option',
+      options: ['Cancel', 'Done'],
+      inputParams: {
+        items: ['Pay In', 'Pay Out', 'Count & Adjust'],
+        map: (item: string) => item,
+      },
+      onOptionClick: (option: string, data: { itemSelection: string }) => {
+        //throw new Error('Function not implemented.');
+        if (option == 'Cancel') return;
+        if (data.itemSelection == 'Pay In') {
+          this._posService.triggerPrompt({
+            type: 'numeric',
+            title: 'Pay In Amount',
+            description: 'How much money is entering the cashbox?',
+            options: ['Cancel', 'Done'],
+            onOptionClick: (option: string, data: any) => {
+              if (option == 'Cancel') return;
+              this._posService.addItem({
+                ProductID: ReservedProductId.PayIn,
+                Title: '0',
+                Price: 0.0,
+                ProductGroupID: null,
+                CreatedAt: '',
+              });
+
+              // Incoming amounts (like cash payment) are negative on receipt
+              this.selectedItem!.unitPrice = data.amount * -1;
+
+              this.selectedItem!.name = 'Pay In';
+              this.closePayment();
+            },
+            dismissable: false,
+          });
+        } else if (data.itemSelection == 'Pay Out') {
+          this._posService.triggerPrompt({
+            type: 'numeric',
+            title: 'Pay Out Amount',
+            description: 'How much money is leaving the cashbox?',
+            options: ['Cancel', 'Done'],
+            onOptionClick: (option: string, data: any) => {
+              if (option == 'Cancel') return;
+              this._posService.addItem({
+                ProductID: ReservedProductId.PayOut,
+                Title: '0',
+                Price: 0.0,
+                ProductGroupID: null,
+                CreatedAt: '',
+              });
+
+              // Incoming amounts (like cash payment) are negative on receipt
+              this.selectedItem!.unitPrice = data.amount;
+
+              this.selectedItem!.name = 'Pay Out';
+              this.closePayment();
+            },
+            dismissable: false,
+          });
+        } else if (data.itemSelection == 'Count & Adjust') {
+            this._posService.triggerPrompt({
+            type: 'numeric',
+            title: 'Count Your Cashbox',
+            description: 'How much money is in your cashbox?',
+            options: ['Cancel', 'Done'],
+            onOptionClick: (option: string, data: any) => {
+              if (option == 'Cancel') return;
+
+              let registeredAmt = this._dbService.getCashboxAmount()
+              let countedAmt = data.amount
+
+              let adjustment = registeredAmt - countedAmt
+              if(adjustment < 0){
+                // Over (positive adjustment = money out)
+              } else if (adjustment > 0) {
+                // Short (negative adjustment = money in)
+              }
+
+              this._posService.addItem({
+                ProductID: ReservedProductId.CashboxAdjustment,
+                Title: '0',
+                Price: 0.0,
+                ProductGroupID: null,
+                CreatedAt: '',
+              });
+
+              // Incoming amounts (like cash payment) are negative on receipt
+              this.selectedItem!.unitPrice = adjustment;
+
+              this.selectedItem!.name = 'Cashbox Adjustment';
+              this.closePayment();
+            },
+            dismissable: false,
+          });
+        }
+      },
+      dismissable: false,
+    });
   }
 
   onQuantityChange() {
@@ -270,7 +386,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   navigateConditional(url: string, blockDuringTransaction: boolean) {
-    if((this.isActiveTransaction && blockDuringTransaction)  || this.promptActive){
+    if (
+      (this.isActiveTransaction && blockDuringTransaction) ||
+      this.promptActive
+    ) {
       return;
     }
     this._router.navigate([url]);
@@ -321,7 +440,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   handleCashPayment(amountReceived: number) {
-    alert(`Cash payment of ${amountReceived} received.`);
+    //alert(`Cash payment of ${amountReceived} received.`);
 
     let totalDue = this._transactionService.total(this.items);
 
@@ -335,8 +454,8 @@ export class AppComponent implements OnInit, OnDestroy {
       this._transactionService.createReceiptItem(
         ReservedProductId.CashPayment,
         1,
-        amountReceived * -1
-      )
+        amountReceived * -1,
+      ),
     );
 
     // Create change TransactionDetail
@@ -347,8 +466,8 @@ export class AppComponent implements OnInit, OnDestroy {
       this._transactionService.createReceiptItem(
         ReservedProductId.CashPaymentChange,
         1,
-        changeAmount
-      )
+        changeAmount,
+      ),
     );
 
     this.closePayment();
@@ -393,6 +512,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.currentTransactionId = null;
 
+    this.cashboxAmount = this._dbService.getCashboxAmount();
     // this._posService.triggerPrompt({
     //   title: 'Transaction finished.',
     //   description: 'Press Start to begin next transaction.',
