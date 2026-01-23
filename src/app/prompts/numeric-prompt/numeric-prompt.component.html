@@ -1,14 +1,14 @@
-<div class="prompt-container">
+<div class="prompt-container" style="display:flex;flex-direction: column;">
   <div class="header">
     <b>{{ title }}</b>
     <p>{{ description }}</p>
   </div>
 
-  <div class="prompt-scroll-area">
+  <div style="display:flex;flex-direction: column;height:400px;max-height: 400px;">
     <div class="numpad-display">
       {{ centsEntered }}
     </div>
-    <div class="numpad">
+    <div class="numpad" style="flex:1;">
       <div class="numpad-button" (click)="onNumpad('7')">
         <div class="text">7</div>
       </div>
@@ -53,8 +53,10 @@
     </div>
   </div>
 
+  <div style="flex:1;"></div>
+
   <div style="padding: 10px" class="button-region">
-    <div *ngFor="let button of options" (click)="onOptionClicked(button, {amount: amount})" class="button">
+    <div *ngFor="let button of options" (click)="onOptionClicked(button, {amount: amount})" class="button active">
       <div class="text">
         {{ button }}
       </div>
