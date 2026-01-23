@@ -290,7 +290,7 @@ export class AppComponent implements OnInit, OnDestroy {
             dismissable: false,
           });
         } else if (data.itemSelection == 'Count & Adjust') {
-            this._posService.triggerPrompt({
+          this._posService.triggerPrompt({
             type: 'numeric',
             title: 'Count Your Cashbox',
             description: 'How much money is in your cashbox?',
@@ -298,11 +298,11 @@ export class AppComponent implements OnInit, OnDestroy {
             onOptionClick: (option: string, data: any) => {
               if (option == 'Cancel') return;
 
-              let registeredAmt = this._dbService.getCashboxAmount()
-              let countedAmt = data.amount
+              let registeredAmt = this._dbService.getCashboxAmount();
+              let countedAmt = data.amount;
 
-              let adjustment = registeredAmt - countedAmt
-              if(adjustment < 0){
+              let adjustment = registeredAmt - countedAmt;
+              if (adjustment < 0) {
                 // Over (positive adjustment = money out)
               } else if (adjustment > 0) {
                 // Short (negative adjustment = money in)
@@ -442,12 +442,7 @@ export class AppComponent implements OnInit, OnDestroy {
   handleCashPayment(amountReceived: number) {
     //alert(`Cash payment of ${amountReceived} received.`);
 
-    let totalDue = this._transactionService.total(this.items);
-
-    if (amountReceived < totalDue) {
-      alert('Insufficient amount received. Please try again.');
-      return;
-    }
+    let totalDue = this._transactionService.totalDue(this.items);
 
     // Create cashpayment TransactionDetail
     this.items.push(
@@ -457,6 +452,11 @@ export class AppComponent implements OnInit, OnDestroy {
         amountReceived * -1,
       ),
     );
+
+    if (amountReceived < totalDue) {
+      // Cannot close, expecting more money
+      return;
+    }
 
     // Create change TransactionDetail
     let changeAmount = amountReceived - totalDue;

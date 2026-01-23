@@ -32,16 +32,16 @@ export class ReceiptComponent implements OnChanges {
   @Output() onClickItemIndex = new EventEmitter<number>();
   @ViewChild('highlightBar') highlightBar!: ElementRef;
 
-  changeAmount() : string | null{
+  changeAmount(): number {
     let item = this.receiptItemList.find(
-      (item) => item.productId == ReservedProductId.CashPaymentChange
+      (item) => item.productId == ReservedProductId.CashPaymentChange,
     );
     if (item) {
-      return item.displayTotal;
+      return item.total;
     } else {
-      return null;
+      return 0;
     }
-  };
+  }
 
   constructor(private _transactionService: TransactionService) {}
 
@@ -59,8 +59,8 @@ export class ReceiptComponent implements OnChanges {
     return this._transactionService.subtotal(this.receiptItemList);
   }
 
-  get displaySubtotal() : string {
-    return "$" + this.subtotal.toFixed(2);
+  get balanceDue(): number {
+    return this._transactionService.totalDue(this.receiptItemList);
   }
 
   public onClickItem(index: number) {

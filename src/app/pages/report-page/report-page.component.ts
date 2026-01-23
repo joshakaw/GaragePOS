@@ -21,18 +21,20 @@ export class ReportPageComponent {
       title: 'Daily Sales Summary',
       small: 'Last Month',
       sql: `SELECT 
-    DATE(t.TimeEnded) as SaleDate,
-    COUNT(DISTINCT t.TransactionID) as TotalTransactions,
-    SUM(td.Quantity * td.UnitPrice) as GrossSales,
-    SUM(CASE WHEN t.IsVoided = 1 THEN td.Quantity * td.UnitPrice ELSE 0 END) as VoidedSales,
-    SUM(CASE WHEN t.IsVoided = 0 THEN td.Quantity * td.UnitPrice ELSE 0 END) as NetSales,
-    SUM(CASE WHEN t.IsVoided = 0 THEN td.Quantity ELSE 0 END) as ItemsSold
+    DATE(t.TimeEnded, 'localtime') as 'Sale Date',
+    PRINTF('$%.2f',SUM(CASE WHEN t.IsVoided = 0 AND td.ProductID > 100 THEN td.Quantity * td.UnitPrice ELSE 0 END)) as 'Net Sales',
+    PRINTF('$%.2f',SUM(CASE WHEN td.ProductID = 50 THEN td.Quantity * td.UnitPrice ELSE 0 END) * -1) as 'Adjustment',
+    COUNT(DISTINCT t.TransactionID) as 'Total Transactions',
+    SUM(CASE WHEN t.IsVoided = 0 THEN td.Quantity ELSE 0 END) as 'Items Sold',
+    PRINTF('$%.2f',SUM(CASE WHEN td.ProductID = 40 THEN td.Quantity * td.UnitPrice ELSE 0 END) * -1) as 'Paid In',
+    PRINTF('$%.2f',SUM(CASE WHEN td.ProductID = 45 THEN td.Quantity * td.UnitPrice ELSE 0 END) * -1) as 'Paid Out',
+    PRINTF('$%.2f',SUM(CASE WHEN t.IsVoided = 1 THEN td.Quantity * td.UnitPrice ELSE 0 END)) as 'Voided Sales'
+
 FROM \`Transaction\` t
 JOIN TransactionDetail td ON t.TransactionID = td.TransactionID
-WHERE DATE(t.TimeEnded) >= DATE('now', '-1 month')
+WHERE DATE(t.TimeEnded, 'localtime') >= DATE('now', '-1 month', 'localtime')
     AND t.TimeEnded IS NOT NULL
-    AND td.ProductID > 100
-GROUP BY DATE(t.TimeEnded)
+GROUP BY DATE(t.TimeEnded, 'localtime')
 ORDER BY DATE(t.TimeEnded) DESC;`,
     },
     {
@@ -40,31 +42,31 @@ ORDER BY DATE(t.TimeEnded) DESC;`,
       small: 'Today',
       sql: `SELECT 
     p.ProductID,
-    p.Title as ProductName,
-    SUM(td.Quantity) as QuantitySold,
-    SUM(td.Quantity * td.UnitPrice) as TotalRevenue,
-    COUNT(DISTINCT td.TransactionID) as TimesOrdered,
-    ROUND(AVG(td.UnitPrice), 2) as AvgPrice
+    p.Title as 'Product Name',
+    SUM(td.Quantity) as 'Quantity Sold',
+    PRINTF('$%.2f',SUM(td.Quantity * td.UnitPrice)) as 'Total Revenue',
+    COUNT(DISTINCT td.TransactionID) as 'Times Ordered',
+    PRINTF('$%.2f',AVG(td.UnitPrice)) as 'Avg. Price'
 FROM Product p
 JOIN TransactionDetail td ON p.ProductID = td.ProductID
 JOIN \`Transaction\` t ON td.TransactionID = t.TransactionID
-WHERE DATE(t.TimeEnded) = DATE('now')
+WHERE DATE(t.TimeEnded, 'localtime') = DATE('now', 'localtime')
     AND t.IsVoided = 0
     AND t.TimeEnded IS NOT NULL
     AND td.ProductID > 100
 GROUP BY p.ProductID, p.Title
-ORDER BY TotalRevenue DESC
+ORDER BY 'Total Revenue' DESC
 LIMIT 20;`,
     },
-    {
-      title: 'Cash In Possession',
-      // Uncomment once PayIn/PayOut is implemented
-      // description:
-      //   'Amount in cashbox used to collect sales and make change. ' +
-      //   'An inaccurate amount indicates clerk error. ' +
-      //   'To make accurate, perform a Pay In or Pay Out.',
-      sql: SqlQueries.CashInPossession,
-    },
+    // {
+    //   title: 'Cash In Possession',
+    //   // Uncomment once PayIn/PayOut is implemented
+    //   // description:
+    //   //   'Amount in cashbox used to collect sales and make change. ' +
+    //   //   'An inaccurate amount indicates clerk error. ' +
+    //   //   'To make accurate, perform a Pay In or Pay Out.',
+    //   sql: SqlQueries.CashInPossession,
+    // },
   ];
 
   constructor(

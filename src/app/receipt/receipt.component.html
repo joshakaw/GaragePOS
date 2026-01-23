@@ -34,7 +34,7 @@
             {{ receiptItem.name }}
           </td>
           <td style="text-align: right" class="pad-right">
-            {{ receiptItem.displayTotal }}
+            {{ receiptItem.total | currency }}
           </td>
         </tr>
       </tbody>
@@ -42,18 +42,18 @@
   </div>
   <div class="summary-area pad">
     <div class="detailtext">Subtotal</div>
-    <div class="detailtext" style="text-align:right;">{{displaySubtotal}}</div>
-    
+    <div class="detailtext" style="text-align:right;">{{subtotal | currency}}</div>
 
-    @if(changeAmount() != null) {
+
+    @if(changeAmount() != 0) {
     <div class="text">Change</div>
     <div class="text" style="text-align: right">
-      {{ changeAmount() }}
+      {{ changeAmount() | currency }}
     </div>
     } @else {
     <div class="text">Balance</div>
     <div class="text" style="text-align: right">
-      {{ displaySubtotal }}
+      {{ balanceDue | currency }}
     </div>
     }
   </div>

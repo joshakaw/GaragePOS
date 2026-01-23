@@ -24,6 +24,9 @@ function createWindow(): BrowserWindow {
     },
   });
 
+  win.removeMenu();
+  win.setTitle("GaragePOS")
+
   if (serve) {
     import('electron-debug').then(debug => {
       debug.default({isEnabled: true, showDevTools: true});

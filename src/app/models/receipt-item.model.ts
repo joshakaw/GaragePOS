@@ -42,10 +42,6 @@ export class ReceiptItem {
     return Number((this.quantity * this.unitPrice).toFixed(2));
   }
 
-  get displayTotal(): string {
-    return '$' + this.total.toFixed(2);
-  }
-
   public get name(): string {
     return this._name;
   }

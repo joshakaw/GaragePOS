@@ -79,7 +79,6 @@ export class TransactionService {
         return sum + next;
       }, 0);
 
-
     // Rounding to the nearest cent $X.XX for subtotal
     // Multipling causes some error, so don't use math.ceil
     let totalCentFixed = Math.round(totalUnfixed * 100) / 100;
@@ -94,6 +93,16 @@ export class TransactionService {
 
   total(items: Array<ReceiptItem>): number {
     return this.subtotal(items) + this.taxTotal(items);
+  }
+
+  totalDue(items: Array<ReceiptItem>): number {
+    let total = items.map((item) => item.total).reduce((sum, next) => {
+        return sum + next;
+      }, 0); 
+
+    let totalFixed = Math.round(total * 100) / 100;
+
+    return totalFixed;
   }
 
   // Database should contain raw numbers that were used in calculated
