@@ -8,10 +8,40 @@
     </div> -->
     <div class="content">
         <div class="receipt">
+            <div style="display: flex; flex: none;height:40px">
+                <button class="footer-button" [disabled]="isActiveTransaction || promptActive">
+                    <div class="text" (click)="onViewPreviousTransactions()">
+                        ◀
+                    </div>
+                </button>
+                <button class="footer-button" style="flex:6;">
+                    <div class="text">
+                        {{currentTransactionId ? "#" + currentTransactionId : "Ready"}}
+
+                    </div>
+                </button>
+                <button class="footer-button" [disabled]="!isActiveTransaction">
+                    <div class="text">
+                        
+                    </div>
+                </button>
+            </div>
+            <!-- <div style="display:flex;height:80px">
+                <div style="width:80px;background-color: aliceblue;">
+                    a
+                </div>
+                <div style="flex:1;text-align: center;">
+                    {{currentTransactionId ? "#" + currentTransactionId : "Ready for Next Transaction"}}
+
+                </div>
+                <div style="width:80px;background-color: aliceblue;">
+                    b
+                </div>
+            </div> -->
             <app-receipt [receiptItemList]="items" [selectedItemIndex]="selectedItemIndex"
                 [transactionReferenceNumber]="currentTransactionId" (onClickItemIndex)="selectedItemIndex = $event"
                 style="flex-grow: 1" />
-            <div style="display: flex; flex: none">
+            <div style="display: flex; flex: none;height:80px;">
                 <button class="footer-button footer-button-border-right" [disabled]="!isActiveTransaction">
                     <div class="text" (click)="onQuantityChange()">
                         Change<br />
@@ -40,17 +70,6 @@
             <div class="grid" [hidden]="promptActive">
                 <router-outlet></router-outlet>
             </div>
-            <!-- @if (!configureActive) {
-      <div class="grid" [hidden]="promptActive">
-        <app-preset-grid  />
-      </div>
-      } @else {
-      <div class="grid" [hidden]="promptActive">
-        <app-configure></app-configure>
-
-      </div>
-      } -->
-
             <div class="function-deck">
                 <button class="footer-button footer-button-border-right" [routerLink]="['/grid']"
                     routerLinkActive="navigated" [disabled]="promptActive">
@@ -58,14 +77,6 @@
                         Quick Grid
                     </div>
                 </button>
-                <!-- <button class="footer-button footer-button-border-right" 
-                [routerLink]="['/configure']"
-                routerLinkActive="navigated"
-                [disabled]="isActiveTransaction || promptActive">
-                    <div class="text" (click)="navigateConditional('configure')">
-                        Configure Grid
-                    </div>
-                </button> -->
                 <button class="footer-button footer-button-border-right" [routerLink]="['/product']"
                     routerLinkActive="navigated" [disabled]="promptActive">
                     <div class="text" (click)="navigateConditional('product', false)">

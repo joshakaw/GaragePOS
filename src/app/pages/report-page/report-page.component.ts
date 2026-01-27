@@ -25,7 +25,7 @@ export class ReportPageComponent {
     PRINTF('$%.2f',SUM(CASE WHEN t.IsVoided = 0 AND td.ProductID > 100 THEN td.Quantity * td.UnitPrice ELSE 0 END)) as 'Net Sales',
     PRINTF('$%.2f',SUM(CASE WHEN td.ProductID = 50 THEN td.Quantity * td.UnitPrice ELSE 0 END) * -1) as 'Adjustment',
     COUNT(DISTINCT t.TransactionID) as 'Total Transactions',
-    SUM(CASE WHEN t.IsVoided = 0 THEN td.Quantity ELSE 0 END) as 'Items Sold',
+    SUM(CASE WHEN t.IsVoided = 0 AND td.ProductID > 100 THEN td.Quantity ELSE 0 END) as 'Items Sold',
     PRINTF('$%.2f',SUM(CASE WHEN td.ProductID = 40 THEN td.Quantity * td.UnitPrice ELSE 0 END) * -1) as 'Paid In',
     PRINTF('$%.2f',SUM(CASE WHEN td.ProductID = 45 THEN td.Quantity * td.UnitPrice ELSE 0 END) * -1) as 'Paid Out',
     PRINTF('$%.2f',SUM(CASE WHEN t.IsVoided = 1 THEN td.Quantity * td.UnitPrice ELSE 0 END)) as 'Voided Sales'

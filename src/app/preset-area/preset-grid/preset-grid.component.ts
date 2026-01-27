@@ -32,7 +32,7 @@ export class PresetGridComponent implements OnInit {
   constructor(
     private _dbService: DbService,
     private _posService: PosService,
-    private logger: NGXLogger
+    private logger: NGXLogger,
   ) {
     this.gridLayoutId = 1;
   }
@@ -44,7 +44,7 @@ export class PresetGridComponent implements OnInit {
 
   goBack() {
     this.selectedGridMenuId = this._dbService.getParentOfGridMenuId(
-      this.selectedGridMenuId
+      this.selectedGridMenuId,
     );
     this.refreshGridItems();
   }
@@ -79,7 +79,6 @@ export class PresetGridComponent implements OnInit {
     this.logger.info('Grid items refreshed.');
   }
 
-  // Copied from configure component
   /**
    * Creates an initial blank grid item array
    * @param width X Size
@@ -109,7 +108,6 @@ export class PresetGridComponent implements OnInit {
     return tempGridItemsArray;
   }
 
-  // Copied from configure componet
   /**
    * Calculates the X,Y coordinates based off of the
    * current grid size.
@@ -160,7 +158,7 @@ export class PresetGridComponent implements OnInit {
         inputParams: {
           gridMenuButton: item,
         },
-        options: ['Delete', 'Cancel', 'Save'],
+        options: ['Cancel', 'Delete', 'Save'],
         onOptionClick: (option: string, data: any): void => {
           if (option == 'Delete') {
             this._posService.triggerPrompt({
@@ -172,7 +170,7 @@ export class PresetGridComponent implements OnInit {
                 if (option == 'Yes') {
                   this._dbService.deleteGridMenuButton(
                     item.GridMenuButtonID,
-                    item.OnClick_OpenGridMenuID
+                    item.OnClick_OpenGridMenuID,
                   );
                 }
 
@@ -199,7 +197,7 @@ export class PresetGridComponent implements OnInit {
         title: 'Modify Blank Tile',
         description: 'What action do you want this tile to perform?',
         type: 'basic',
-        options: ['Add Product', 'Open Submenu', 'Cancel'],
+        options: ['Cancel', 'Add Product', 'Open Submenu'],
         dismissable: true,
         onOptionClick: (btnLbl, data) => {
           if (btnLbl == 'Add Product') {
@@ -214,15 +212,21 @@ export class PresetGridComponent implements OnInit {
               inputParams: {
                 listItems: allProducts,
                 items: this._dbService.getAllProducts(),
-                map: (item: DbProduct) => item.Title,
+                map: (item: DbProduct) =>
+                  (this._dbService.isProductInPresetGrid(item.ProductID)
+                    ? ''
+                    : '* ') + item.Title,
               },
               options: ['Cancel', 'Select'],
-              onOptionClick: (option: string, data: any): void => {
+              onOptionClick: (
+                option: string,
+                data: { itemSelection: DbProduct; listItemSelection: string },
+              ): void => {
                 if (option == 'Select') {
                   this.initializeAddProductGridItem(
                     item,
                     index,
-                    data.listItemSelection
+                    data.itemSelection.Title,
                   );
                 }
               },
@@ -257,12 +261,12 @@ export class PresetGridComponent implements OnInit {
   private createSubmenuAndOpen(
     item: DbGridMenuButton,
     index: number,
-    name: string
+    name: string,
   ) {
     if (item.GridMenuButtonID == -1) {
       // Create gridmenu
       let newGridMenuId = this._dbService.createGridMenu(
-        this.selectedGridMenuId
+        this.selectedGridMenuId,
       );
 
       try {
@@ -287,7 +291,7 @@ export class PresetGridComponent implements OnInit {
       }
 
       this.logger.info(
-        `Creating submenu - changing selected Grid Menu ID ${this.selectedGridMenuId} to ${newGridMenuId}`
+        `Creating submenu - changing selected Grid Menu ID ${this.selectedGridMenuId} to ${newGridMenuId}`,
       );
 
       this.selectedGridMenuId = newGridMenuId;
@@ -299,7 +303,7 @@ export class PresetGridComponent implements OnInit {
   initializeAddProductGridItem(
     item: DbGridMenuButton,
     index: number,
-    productName: string
+    productName: string,
   ) {
     let productInfo: DbProduct = this._dbService.getProductByName(productName);
     if (item.GridMenuButtonID == -1) {

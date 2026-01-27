@@ -2,7 +2,7 @@
     <div style="flex-grow:1">
         <div class="list-region">
             <div class="button new" (click)="onNew()" *ngIf="configureMode">
-                <div class="text">New</div>
+                <div class="text">* New</div>
             </div>
             <div class="button item" *ngFor="let product of products" (click)="onClick(product)">
                 <div class="text">

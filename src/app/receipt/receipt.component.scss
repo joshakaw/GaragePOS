@@ -26,6 +26,10 @@ $pad: 20px;
   padding-right: $pad;
 }
 
+.receipt-table .incoming {
+  color: green;
+}
+
 .selected {
   // background-color: $primary;
   // color: white; /* optional: make text readable */
@@ -79,7 +83,7 @@ $pad: 20px;
 
 .receipt-area {
   position: relative;
-  padding-top: $pad;
+  padding-top: 0px; // Must equal the plus term in highlightbar ts logic
   height: 0;
   flex: 1 1 auto;
   overflow-y: auto;

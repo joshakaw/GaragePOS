@@ -20,6 +20,7 @@ import { TransactionService } from './core/services/transaction/transaction.serv
 import {
   DbGridMenuButton,
   DbProduct,
+  DbTransaction,
   ReservedProductId,
 } from './models/db/product';
 import {
@@ -28,10 +29,7 @@ import {
   RouterLinkWithHref,
   RouterLinkActive,
 } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ConfigureComponent } from './configure/configure.component';
-import { ListPromptComponent } from './prompts/list-prompt/list-prompt.component';
 import { ElectronService } from './core/services';
 import { TranslateService } from '@ngx-translate/core';
 import { APP_CONFIG } from '../environments/environment';
@@ -137,10 +135,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   set selectedItemIndex(value: number | null) {
-    if (value == null) {
-      this._selectedItemIndex = null;
-    } else if (isValidIndex(this.items, value)) {
+    if (isValidIndex(this.items, value ?? -1)) {
       this._selectedItemIndex = value;
+    } else {
+      this._selectedItemIndex = null;
     }
   }
 
@@ -330,6 +328,41 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
+  onViewPreviousTransactions() {
+    if (this.currentTransactionId || this.promptActive) {
+      return;
+    }
+
+    this._posService.triggerPrompt({
+      type: 'list',
+      title: 'Previous Receipts',
+      description: 'Click a transaction to display',
+      inputParams: {
+        items: this._dbService.listRecentTransactions(),
+        map: (item: DbTransaction) => new Date(item.TimeEnded).toLocaleString(),
+        onFocus: (item: DbTransaction) => {
+          this.currentTransactionId = item.TransactionID;
+          this.items = this._transactionService.rebuildReceiptItems(
+            item.TransactionID,
+          );
+          this.selectedItemIndex = null;
+        },
+      },
+      options: ['Close'],
+      onOptionClick: (option: string, data: any): void => {
+        this.currentTransactionId = null;
+        this.selectedItemIndex = null;
+        if (this.items.length > 0) {
+          // Workaround to get the highlight bar back to the top
+          this.items = [this.items[0]];
+          //this.receiptViewer.
+        }
+        this.items = [];
+      },
+      dismissable: false,
+    });
+  }
+
   onQuantityChange() {
     if (!this.currentTransactionId || this.promptActive) {
       return;
@@ -394,19 +427,6 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     this._router.navigate([url]);
   }
-  onConfigureGrid() {
-    if (this.promptActive || this.currentTransactionId) {
-      return;
-    }
-
-    if (this._router.url == '/configure') {
-      this._router.navigate(['grid']);
-    } else {
-      this._router.navigate(['configure']);
-    }
-
-    // this._router.navigate(['configure']);
-  }
 
   onSafeDrop() {
     this._posService.triggerPrompt({
@@ -428,12 +448,34 @@ export class AppComponent implements OnInit, OnDestroy {
       description: 'Enter amount received:',
       type: 'numeric',
       options: ['Cancel', 'Enter'],
+      inputParams: {
+        presets: ['Exact Dollar', 'Next Dollar', '$5', '$10'],
+        defaultOption: 'Enter',
+      },
       dismissable: true,
-      onOptionClick: (btnLbl, data) => {
-        let numericData = data as { amount: number };
+      onOptionClick: (btnLbl, data: { amount: number; preset?: string }) => {
+        let amount = data.amount;
+        let totalDue = this._transactionService.totalDue(this.items);
+        if (data.preset) {
+          switch (data.preset) {
+            case 'Exact Dollar':
+              amount = totalDue;
+              break;
+            case 'Next Dollar':
+              amount = Math.ceil(totalDue);
+              break;
+            case '$5':
+              amount = 5;
+              break;
+            case '$10':
+              amount = 10;
+              break;
+          }
+        }
+
         if (btnLbl == 'Enter') {
           // Handle cash payment logic here
-          this.handleCashPayment(numericData.amount);
+          this.handleCashPayment(amount);
         }
       },
     });

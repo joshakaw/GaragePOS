@@ -5,7 +5,7 @@
     </div>
     <div class="list-region" style="flex:1">
         <div *ngFor="let listItem of inputParams.items"
-            (click)="selection = listItem"
+            (click)="selection = listItem;onListItemFocus(listItem)"
             [class.active]="selection === listItem"
             class="button" style="max-height:80px">
             <div class="text">

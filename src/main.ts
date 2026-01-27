@@ -15,7 +15,6 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
 import { PageNotFoundComponent } from './app/shared/components';
-import { ConfigureComponent } from './app/configure/configure.component';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 import { PresetGridComponent } from './app/preset-area/preset-grid/preset-grid.component';
 import { ReportPageComponent } from './app/pages/report-page/report-page.component';
@@ -41,10 +40,6 @@ bootstrapApplication(AppComponent, {
       {
         path: 'grid',
         component: PresetGridComponent,
-      },
-      {
-        path: 'configure',
-        component: ConfigureComponent,
       },
       {
         path: 'report',

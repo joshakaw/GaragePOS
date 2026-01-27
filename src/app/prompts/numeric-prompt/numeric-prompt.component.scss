@@ -1,7 +1,7 @@
 @import "styles.scss";
 
 
-$numpadWidth: 400px;
+$numpadWidth: 500px;
 
 
 .prompt-container .numpad-display {
@@ -16,13 +16,13 @@ $numpadWidth: 400px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width:calc($numpadWidth - 16px);
+  width:calc($numpadWidth - 16px - 125px);
 }
 
 // Numpad grid container
 .prompt-container .numpad {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
   gap: 8px;
   padding-top:8px;

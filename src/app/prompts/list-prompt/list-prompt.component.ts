@@ -19,7 +19,11 @@ import { FormsModule } from '@angular/forms';
 })
 export class ListPromptComponent extends BasePrompt {
   @Input() params!: TriggerPromptParams;
-  inputParams: { items: Array<any>; map: (item: any) => string };
+  inputParams: {
+    items: Array<any>;
+    map: (item: any) => string;
+    onFocus?: (item: any) => void;
+  };
 
   selection: any | undefined;
 
@@ -41,11 +45,19 @@ export class ListPromptComponent extends BasePrompt {
 
   public setParams(params: TriggerPromptParams): void {
     super.setParams(params);
-    
+
     if (this.inputParams.items.length == 0) {
       throw new Error('List prompt was supplied with no items.');
     }
     this.selection = this.inputParams.items[0];
+    this.onListItemFocus(this.selection);
+  }
+
+  onListItemFocus(item: any) {
+    if (!this.inputParams.onFocus) {
+      return;
+    }
+    this.inputParams.onFocus(item);
   }
 
   protected override onOptionClicked(option: string): void {

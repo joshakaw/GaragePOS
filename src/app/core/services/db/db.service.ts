@@ -6,6 +6,8 @@ import {
   DbGridMenuButton,
   DbProduct,
   DbProductGroup,
+  DbTransaction,
+  DbTransactionDetail,
   ReservedProductId,
 } from '../../../models/db/product';
 import { NGXLogger } from 'ngx-logger';
@@ -308,6 +310,14 @@ export class DbService {
     }
   }
 
+  isProductInPresetGrid(ProductID: number): boolean {
+    return (
+      +this.execSql(
+        `SELECT COUNT(*) FROM GridMenuButton WHERE OnClick_AddProductID = ${ProductID}`,
+      ).data[0][0] > 0
+    );
+  }
+
   /**
    * @returns Newly created ProductID
    */
@@ -415,6 +425,12 @@ export class DbService {
     return result.lastInsertRowid as number;
   }
 
+  listRecentTransactions(): Array<DbTransaction> {
+    return this.db
+      .prepare('SELECT * FROM `Transaction` WHERE IsVoided != 1 ORDER BY TimeEnded DESC')
+      .all() as Array<DbTransaction>;
+  }
+
   endTransaction(transactionId: number, isVoid: boolean) {
     let timeEnded = new Date().toISOString();
 
@@ -467,5 +483,14 @@ export class DbService {
       );
 
     return result.lastInsertRowid as number;
+  }
+
+  getTransactionDetailItems(transactionId: number) {
+    return this.db
+      .prepare(`SELECT * FROM TransactionDetail
+         WHERE TransactionID = @TransactionID`)
+      .all({
+        TransactionID: transactionId
+      }) as Array<DbTransactionDetail>;
   }
 }

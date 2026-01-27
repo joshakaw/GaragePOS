@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { DbService } from '../db/db.service';
-import { ReceiptItem, ReceiptItemParams } from '../../../models/receipt-item.model';
-import { ReservedProductId } from '../../../models/db/product';
+import {
+  ReceiptItem,
+  ReceiptItemParams,
+} from '../../../models/receipt-item.model';
+import {
+  DbProduct,
+  DbTransactionDetail,
+  ReservedProductId,
+} from '../../../models/db/product';
 import { NGXLogger } from 'ngx-logger';
 
 /**
@@ -13,7 +20,37 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class TransactionService {
   // DbService
-  constructor(private _dbService: DbService, private logger : NGXLogger) {}
+  constructor(
+    private _dbService: DbService,
+    private logger: NGXLogger,
+  ) {}
+
+  /**
+   * Rebuild a previous transaction for reviewing
+   * @param transactionId ID of Transaction
+   */
+  rebuildReceiptItems(transactionId: number): Array<ReceiptItem> {
+    let items = [];
+
+    let products: Array<DbTransactionDetail> =
+      this._dbService.getTransactionDetailItems(transactionId);
+
+    for (let product of products) {
+      if (product.Quantity == 0) {
+        continue;
+      }
+      let params: ReceiptItemParams = {
+        productId: product.ProductID,
+        productTitle: product.ProductTitle,
+        unitPrice: product.UnitPrice,
+        quantity: product.Quantity,
+      };
+
+      items.push(new ReceiptItem(params));
+    }
+
+    return items;
+  }
 
   /**
    * Creates a new ReceiptItem
@@ -25,21 +62,22 @@ export class TransactionService {
   createReceiptItem(
     productId: number,
     quantity?: number,
-    price?: number
+    price?: number,
   ): ReceiptItem {
     let prod = this._dbService.getProduct(productId);
 
-    if(!prod){
-      this.logger.warn(`Receipt item was created from undefined product ID ${productId}. `
-        + `Blank receipt item created.`
-      )
+    if (!prod) {
+      this.logger.warn(
+        `Receipt item was created from undefined product ID ${productId}. ` +
+          `Blank receipt item created.`,
+      );
       // TODO: Create a product not found factory class or something?
-      let params : ReceiptItemParams = {
+      let params: ReceiptItemParams = {
         productId: ReservedProductId.ProductNotFound,
         productTitle: '',
         unitPrice: 0,
-        quantity: 0
-      }
+        quantity: 0,
+      };
       return new ReceiptItem(params);
     }
 
@@ -96,9 +134,11 @@ export class TransactionService {
   }
 
   totalDue(items: Array<ReceiptItem>): number {
-    let total = items.map((item) => item.total).reduce((sum, next) => {
+    let total = items
+      .map((item) => item.total)
+      .reduce((sum, next) => {
         return sum + next;
-      }, 0); 
+      }, 0);
 
     let totalFixed = Math.round(total * 100) / 100;
 

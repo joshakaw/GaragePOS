@@ -69,19 +69,23 @@ export class ReceiptComponent implements OnChanges {
 
   private updateHighlightBarPosition() {
     let index = this.selectedItemIndex;
-    if (index == null) {
-      return;
-    }
 
     requestAnimationFrame(() => {
-      const rows = document.querySelectorAll('.receipt-table tbody tr');
-      const row = rows[index] as HTMLElement;
+      const rows = document.querySelectorAll(
+        '.receipt-table tbody tr',
+      ) as NodeListOf<HTMLElement>;
+      const rowOffset = index
+        ? {
+            offsetTop: rows[index].offsetTop,
+            offsetHeight: rows[index].offsetHeight,
+          }
+        : { offsetTop: 0, offsetHeight: 40 };
       const bar = this.highlightBar?.nativeElement as HTMLElement;
 
-      if (row && bar) {
-        const offsetTop = row.offsetTop + 20;
+      if (bar) {
+        const offsetTop = rowOffset.offsetTop + 0; // the plus term must equal the $pad scss variable
         bar.style.top = offsetTop + 'px';
-        bar.style.height = row.offsetHeight + 'px'; // Optional: match dynamic height
+        bar.style.height = rowOffset.offsetHeight + 'px'; // Optional: match dynamic height
       }
     });
   }

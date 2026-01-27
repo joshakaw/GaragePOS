@@ -50,7 +50,7 @@ export class ProductPageComponent {
           { action: 'Price', current: `\$${product.Price.toFixed(2)}` },
           {
             action: 'Group',
-            current: `${this._dbService.getProductGroupTitle(product.ProductGroupID) ?? 'None'}`,
+            current: `${this._dbService.getProductGroupTitle(product.ProductGroupID) ?? '(None)'}`,
           },
         ],
         map: (item: any) => item.action + ': ' + item.current,
@@ -79,7 +79,7 @@ export class ProductPageComponent {
             type: 'keyboard',
             title: 'Edit Product: Title',
             description: 'What title should the product have?',
-            options: ['Done', 'Cancel'],
+            options: ['Cancel', 'Done'],
             inputParams: {
               startingInputValue: product.Title,
             },
@@ -101,7 +101,7 @@ export class ProductPageComponent {
             options: ['Cancel', 'Set'],
             inputParams: {
               items: [
-                { ProductGroupID: null, Title: '* None' },
+                { ProductGroupID: null, Title: '(None)' },
                 // TODO: Add New Group functionality
                 //{ ProductGroupID: -98, Title: '* Add New Group' },
                 ...this._dbService.getAllProductGroups(),
@@ -139,16 +139,19 @@ export class ProductPageComponent {
         listItems: this._dbService
           .getAllProductGroups()
           .map((item) => item.Title),
-        items: this._dbService.getAllProductGroups(),
+        items: [
+          { ProductGroupID: -100, Title: '(No Filter)', CreatedAt: '' },
+          ...this._dbService.getAllProductGroups(),
+        ],
         map: (item: DbProductGroup) => item.Title,
       },
-      options: ['Cancel', 'Clear Filters', 'Filter'],
+      options: ['Cancel', 'Filter'],
       onOptionClick: (
         option: string,
         data: { itemSelection: DbProductGroup },
       ): void => {
         if (option == 'Cancel') return;
-        else if (option == 'Clear Filters') {
+        else if (data.itemSelection.ProductGroupID == -100) {
           this.currentFilter = undefined;
         } else if (option == 'Filter') {
           this.currentFilter = data.itemSelection;
