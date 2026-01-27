@@ -32,6 +32,8 @@ export class ReceiptComponent implements OnChanges {
   @Output() onClickItemIndex = new EventEmitter<number>();
   @ViewChild('highlightBar') highlightBar!: ElementRef;
 
+  public memo : string = '';
+
   changeAmount(): number {
     let item = this.receiptItemList.find(
       (item) => item.productId == ReservedProductId.CashPaymentChange,

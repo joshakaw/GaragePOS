@@ -15,7 +15,7 @@
                     </div>
                 </button>
                 <button class="footer-button" style="flex:6;">
-                    <div class="text">
+                    <div class="text" (click)="onModifyTransaction()">
                         {{currentTransactionId ? "#" + currentTransactionId : "Ready"}}
 
                     </div>
@@ -117,7 +117,7 @@
                 <div class="text">Pay Cash</div>
             </button>
             <button class="footer-button-mod" (click)="onVoidTransaction()" [disabled]="!isActiveTransaction">
-                <div class="text">Void Trans.</div>
+                <div class="text">Void Sale</div>
             </button>
             <button class="footer-button-mod" (click)="onCashbox()" [disabled]="isActiveTransaction || promptActive">
                 <div class="text">

@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS "Transaction" (
 	"IsVoided"	INT NOT NULL DEFAULT 0 CHECK("IsVoided" IN (0, 1)),
 	"TimeStarted"	TEXT,
 	"TimeEnded"	TEXT,
+	"Memo" TEXT,
 	PRIMARY KEY("TransactionID")
 ) STRICT;
 CREATE TABLE IF NOT EXISTS "TransactionDetail" (

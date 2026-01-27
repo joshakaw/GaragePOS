@@ -1,4 +1,10 @@
-import { Component, Input } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  ViewChild,
+} from '@angular/core';
 import { BasePrompt } from '../base-prompt';
 import { CommonModule } from '@angular/common';
 import {
@@ -13,12 +19,24 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './keyboard-prompt.component.html',
   styleUrls: ['./keyboard-prompt.component.scss', '../../shared.scss'],
 })
-export class KeyboardPromptComponent extends BasePrompt {
+export class KeyboardPromptComponent
+  extends BasePrompt
+  implements AfterViewInit
+{
   @Input() params!: TriggerPromptParams;
   inputValue: string = '';
 
+  inputParams: { startingInputValue: string; onEnterOption?: string };
+
+  @ViewChild('myInput') inputElement!: ElementRef;
+
   constructor(private _posService: PosService) {
     super();
+    this.inputParams = { startingInputValue: '' };
+  }
+
+  ngAfterViewInit(): void {
+    this.inputElement.nativeElement.focus();
   }
 
   protected override onOptionClicked(
@@ -37,6 +55,14 @@ export class KeyboardPromptComponent extends BasePrompt {
 
   protected override onDismissClicked(): void {
     this._posService.promptHandled();
+  }
+
+  protected onEnter() {
+    if (!this.inputParams.onEnterOption) return;
+
+    this.onOptionClicked(this.inputParams.onEnterOption, {
+      inputValue: this.inputValue,
+    });
   }
 
   private _centsEntered: number = 0;

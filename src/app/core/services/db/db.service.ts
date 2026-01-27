@@ -425,6 +425,21 @@ export class DbService {
     return result.lastInsertRowid as number;
   }
 
+  updateTransactionMemo(transactionId: number, memo: string){
+    this.db
+      .prepare(
+        `
+        UPDATE "Transaction"
+        SET Memo = @Memo
+        WHERE TransactionID = @TransactionID
+        `,
+      )
+      .run({
+        TransactionID: transactionId,
+        Memo: memo
+      });
+  }
+
   listRecentTransactions(): Array<DbTransaction> {
     return this.db
       .prepare('SELECT * FROM `Transaction` WHERE IsVoided != 1 ORDER BY TimeEnded DESC')

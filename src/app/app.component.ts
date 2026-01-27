@@ -346,18 +346,49 @@ export class AppComponent implements OnInit, OnDestroy {
             item.TransactionID,
           );
           this.selectedItemIndex = null;
+          this.receiptViewer.memo = item.Memo;
         },
       },
       options: ['Close'],
       onOptionClick: (option: string, data: any): void => {
         this.currentTransactionId = null;
         this.selectedItemIndex = null;
+        this.receiptViewer.memo = '';
+
         if (this.items.length > 0) {
           // Workaround to get the highlight bar back to the top
           this.items = [this.items[0]];
           //this.receiptViewer.
         }
         this.items = [];
+      },
+      dismissable: false,
+    });
+  }
+
+  onModifyTransaction() {
+    if (this.currentTransactionId == null || this.promptActive) {
+      return;
+    }
+
+    this._posService.triggerPrompt({
+      type: 'keyboard',
+      title: 'Attach Memo',
+      description: 'What is your message?',
+      options: ['Cancel', 'Save'],
+      inputParams: {
+        startingInputValue: this.receiptViewer.memo,
+        onEnterOption: 'Save'
+      },
+      onOptionClick: (option: string, data: { inputValue: string }): void => {
+        if (option == 'Cancel') return;
+        this._dbService.updateTransactionMemo(
+          this.currentTransactionId!,
+          data.inputValue,
+        );
+        this.receiptViewer.memo = data.inputValue;
+
+        //throw new Error('Function not implemented.');
       },
       dismissable: false,
     });

@@ -5,7 +5,7 @@
   </div>
 
   <div class="prompt-scroll-area">
-    Input: <input class="field-display" [(ngModel)]="inputValue">
+    <input #myInput class="field-display" [(ngModel)]="inputValue"(keydown.enter)="onEnter()">
   </div>
 
   <div style="padding: 10px" class="button-region">

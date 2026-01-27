@@ -34,6 +34,7 @@ export type DbTransaction = {
   IsVoided: boolean;
   TimeStarted: string;
   TimeEnded: string;
+  Memo: string;
 };
 
 export type DbTransactionDetail = {
