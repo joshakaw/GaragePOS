@@ -1,6 +1,8 @@
 # GaragePOS
 A Point of Sale (POS) system for selling items in simple multi-item, cash transactions, like those at garage sales.
 
+![GaragePOS App Preview](image.png)
+
 # Notes
 This product uses NGX Logger for logging purposes. Use dependency injection
 to bring it into your components to use.
