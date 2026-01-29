@@ -1,11 +1,11 @@
 {
-  "name": "angular-electron",
-  "description": "Angular Electron sample",
+  "name": "garage-pos",
+  "version": "0.1.0",
+  "description": "",
+  "homepage": "https://github.com/joshakaw/GaragePOS",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "Josh Miller"
   },
-  "version": "15.0.0",
   "main": "main.js",
   "private": true,
   "dependencies": {

@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Database, Statement } from 'better-sqlite3';
 import { DB_SCHEMA } from './schema';
-import { ReceiptItem } from '../../../models/receipt-item.model';
+import {
+  ReceiptItem,
+  ReceiptItemParams,
+} from '../../../models/receipt-item.model';
 import {
   DbGridMenuButton,
   DbProduct,
@@ -12,6 +15,7 @@ import {
 } from '../../../models/db/product';
 import { NGXLogger } from 'ngx-logger';
 import { SqlQueries } from '../../../models/queries';
+import path from 'path';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +26,7 @@ export class DbService {
   constructor(private logger: NGXLogger) {
     console.log(window.require);
     if (typeof window.require == 'undefined') {
-      throw new Error(
+      alert(
         'DbService cannot be ran on a web browser. ' +
           'The better-sqlite3 package is needed from the ' +
           "Electron main process, which doesn't run on browser.",
@@ -30,7 +34,11 @@ export class DbService {
     }
 
     const DB = window.require('better-sqlite3');
-    this.db = new DB('./app/UserData.db');
+    const ipcRenderer = window.require('electron').ipcRenderer;
+    let appPath = ipcRenderer.sendSync('get-userdata-path');
+    console.log(appPath);
+    const dbPath = path.join(appPath, 'UserData.db');
+    this.db = new DB(dbPath);
     this.db.pragma('journal_mode = WAL');
 
     this.initialSeeding();
@@ -52,10 +60,11 @@ export class DbService {
       .run();
 
     // Add main menu ID=1
-    this.db
+    let gridResult = this.db
       .prepare('INSERT OR IGNORE INTO GridMenu (GridMenuID) VALUES (1)')
       .run();
 
+    let firstTimeRunning = gridResult.changes == 0 ? false : true;
     /*
       A normal transaction should add up to zero. Since the receipt
       takes the perspective of the customer, our loss-in-value departments
@@ -87,7 +96,7 @@ export class DbService {
     );
 
     let insertProducts = this.db.transaction(() => {
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i <= 100; i++) {
         let name = systemProducts.find((p) => p.id === i) ?? {
           id: i,
           title: 'SYS PROD ' + i,
@@ -97,6 +106,20 @@ export class DbService {
     });
 
     insertProducts();
+
+    // First time running operations
+    if (!firstTimeRunning) return;
+
+    // Add an initial Pay In transaction to allow cashbox total
+    let transId = this.createNewTransaction(1);
+    let initialTransaction: ReceiptItemParams = {
+      productId: ReservedProductId.CashboxAdjustment,
+      productTitle: 'Initialize Cashbox',
+      quantity: 1,
+      unitPrice: 0,
+    };
+    this.addTransactionDetail(new ReceiptItem(initialTransaction), transId);
+    this.endTransaction(transId, false);
   }
 
   /**
@@ -425,7 +448,7 @@ export class DbService {
     return result.lastInsertRowid as number;
   }
 
-  updateTransactionMemo(transactionId: number, memo: string){
+  updateTransactionMemo(transactionId: number, memo: string) {
     this.db
       .prepare(
         `
@@ -436,13 +459,15 @@ export class DbService {
       )
       .run({
         TransactionID: transactionId,
-        Memo: memo
+        Memo: memo,
       });
   }
 
   listRecentTransactions(): Array<DbTransaction> {
     return this.db
-      .prepare('SELECT * FROM `Transaction` WHERE IsVoided != 1 ORDER BY TimeEnded DESC')
+      .prepare(
+        'SELECT * FROM `Transaction` WHERE IsVoided != 1 ORDER BY TimeEnded DESC',
+      )
       .all() as Array<DbTransaction>;
   }
 
@@ -502,10 +527,12 @@ export class DbService {
 
   getTransactionDetailItems(transactionId: number) {
     return this.db
-      .prepare(`SELECT * FROM TransactionDetail
-         WHERE TransactionID = @TransactionID`)
+      .prepare(
+        `SELECT * FROM TransactionDetail
+         WHERE TransactionID = @TransactionID`,
+      )
       .all({
-        TransactionID: transactionId
+        TransactionID: transactionId,
       }) as Array<DbTransactionDetail>;
   }
 }

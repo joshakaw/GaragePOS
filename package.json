@@ -1,12 +1,12 @@
 {
-  "name": "angular-electron",
-  "version": "15.0.0",
-  "description": "Angular 19 with Electron 36 (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
+  "name": "garage-pos",
+  "version": "0.1.0",
+  "description": "",
+  "homepage": "https://github.com/joshakaw/GaragePOS",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "Josh Miller"
   },
+  "productName": "GaragePOS",
   "keywords": [
     "angular",
     "angular 19",

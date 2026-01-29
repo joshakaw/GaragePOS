@@ -1,13 +1,12 @@
-import {app, BrowserWindow, screen} from 'electron';
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+  serve = args.some((val) => val === '--serve');
 
 function createWindow(): BrowserWindow {
-
   const size = screen.getPrimaryDisplay().workAreaSize;
 
   // Create the browser window.
@@ -20,22 +19,30 @@ function createWindow(): BrowserWindow {
       nodeIntegration: true,
       allowRunningInsecureContent: serve,
       contextIsolation: false,
-      webSecurity: !serve
+      webSecurity: !serve,
     },
   });
 
   win.removeMenu();
-  win.setTitle("GaragePOS")
+  win.setTitle('GaragePOS');
+
+  ipcMain.on('get-userdata-path', (e) => {
+    if (serve) {
+      e.returnValue = path.join(app.getAppPath(), 'app');
+    } else {
+      e.returnValue = app.getPath('userData');
+    }
+  });
 
   if (serve) {
-    import('electron-debug').then(debug => {
-      debug.default({isEnabled: true, showDevTools: true});
+    import('electron-debug').then((debug) => {
+      debug.default({ isEnabled: true, showDevTools: true });
     });
 
-    import('electron-reloader').then(reloader => {
+    import('electron-reloader').then((reloader) => {
       const reloaderFn = (reloader as any).default || reloader;
       reloaderFn(module, {
-        ignore: ['*.db', '**/*.db', '**/*.db-shm', '**/*.db-wal'] // Ignore SQLite database files
+        ignore: ['*.db', '**/*.db', '**/*.db-shm', '**/*.db-wal'], // Ignore SQLite database files
       });
     });
     win.loadURL('http://localhost:4200');
@@ -44,7 +51,7 @@ function createWindow(): BrowserWindow {
     let pathIndex = './index.html';
 
     if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-       // Path when running electron in local folder
+      // Path when running electron in local folder
       pathIndex = '../dist/index.html';
     }
 
@@ -87,7 +94,6 @@ try {
       createWindow();
     }
   });
-
 } catch (e) {
   // Catch Error
   // throw e;
