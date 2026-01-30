@@ -86,9 +86,12 @@ export class DbService {
     // Reserve system products (e.g. Pay In, Pay Out, Change)
 
     let systemProducts = [
+      { id: ReservedProductId.ProductNotFound, title: '(Not Found)' },
+      { id: ReservedProductId.CashPayment, title: 'Cash' },
       { id: ReservedProductId.CashPaymentChange, title: 'Change' },
       { id: ReservedProductId.PayIn, title: 'Pay In' },
       { id: ReservedProductId.PayOut, title: 'Pay Out' },
+      { id: ReservedProductId.CashboxAdjustment, title: 'Cashbox Adjustment' },
     ];
 
     let insert = this.db.prepare(
