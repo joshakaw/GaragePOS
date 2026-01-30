@@ -9,7 +9,31 @@ to bring it into your components to use.
 [NGX Logger](https://www.npmjs.com/package/ngx-logger)
 
 
-The following is from the original Angular-Electron template used to begin the project.
+# Build
+The following assumes a Windows environment...
+
+Build for Windows:
+```
+npm run electron:build
+```
+Build for Linux: 
+
+First, install Docker Desktop. Start it & run this command:
+```ps
+docker run --rm -v "[your root project directory]:/project" -w /project node:24 bash -c "npm install && npx electron-builder build -l --arm64 --publish=never"
+```
+To run on Chromebook with Linux (Crostini) environment:
+
+First, get a standalone file (i.e. garage-pos.AppImage) and place it in your Linux files. From the terminal (in the directory with this file):
+```
+chmod +x [...].AppImage
+sudo apt-get install zlib1g-dev
+sudo apt-get install fuse
+./[...].AppImage
+```
+
+The following is from the original Angular-Electron template used to begin the project...
+
 [![Angular Logo](https://www.vectorlogo.zone/logos/angular/angular-icon.svg)](https://angular.io/) [![Electron Logo](https://www.vectorlogo.zone/logos/electronjs/electronjs-icon.svg)](https://electronjs.org/)
 
 ![Maintained][maintained-badge]
