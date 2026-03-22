@@ -78,7 +78,7 @@ export class NumericPromptComponent extends BasePrompt {
     } else if (btnLabel == 'CLR') {
       this._centsEntered = 0;
     } else {
-      let intValue = parseInt(btnLabel);
+      const intValue = parseInt(btnLabel);
       this._centsEntered = this._centsEntered * 10 + intValue;
     }
   }

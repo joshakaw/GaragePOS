@@ -5,7 +5,6 @@ import {
   ReceiptItemParams,
 } from '../../../models/receipt-item.model';
 import {
-  DbProduct,
   DbTransactionDetail,
   ReservedProductId,
 } from '../../../models/db/product';
@@ -30,16 +29,16 @@ export class TransactionService {
    * @param transactionId ID of Transaction
    */
   rebuildReceiptItems(transactionId: number): Array<ReceiptItem> {
-    let items = [];
+    const items = [];
 
-    let products: Array<DbTransactionDetail> =
+    const products: Array<DbTransactionDetail> =
       this._dbService.getTransactionDetailItems(transactionId);
 
-    for (let product of products) {
+    for (const product of products) {
       if (product.Quantity == 0) {
         continue;
       }
-      let params: ReceiptItemParams = {
+      const params: ReceiptItemParams = {
         productId: product.ProductID,
         productTitle: product.ProductTitle,
         unitPrice: product.UnitPrice,
@@ -64,7 +63,7 @@ export class TransactionService {
     quantity?: number,
     price?: number,
   ): ReceiptItem {
-    let prod = this._dbService.getProduct(productId);
+    const prod = this._dbService.getProduct(productId);
 
     if (!prod) {
       this.logger.warn(
@@ -72,7 +71,7 @@ export class TransactionService {
           `Blank receipt item created.`,
       );
       // TODO: Create a product not found factory class or something?
-      let params: ReceiptItemParams = {
+      const params: ReceiptItemParams = {
         productId: ReservedProductId.ProductNotFound,
         productTitle: '',
         unitPrice: 0,
@@ -93,7 +92,7 @@ export class TransactionService {
    * Returns true if a product ID shouldn't be included in total.
    */
   isProductForAccountingOnly(product: ReceiptItem) {
-    let accountingProductIds = [
+    const accountingProductIds = [
       ReservedProductId.CashPayment,
       ReservedProductId.CashPaymentChange,
     ];
@@ -106,7 +105,7 @@ export class TransactionService {
    * @returns Subtotal
    */
   subtotal(items: Array<ReceiptItem>): number {
-    let totalUnfixed = items
+    const totalUnfixed = items
       .map((val) => {
         if (this.isProductForAccountingOnly(val)) {
           return 0;
@@ -119,28 +118,23 @@ export class TransactionService {
 
     // Rounding to the nearest cent $X.XX for subtotal
     // Multipling causes some error, so don't use math.ceil
-    let totalCentFixed = Math.round(totalUnfixed * 100) / 100;
+    const totalCentFixed = Math.round(totalUnfixed * 100) / 100;
 
     return totalCentFixed;
   }
 
-  taxTotal(items: Array<ReceiptItem>): number {
-    console.warn('Tax total NOT implemented');
-    return 0;
-  }
-
   total(items: Array<ReceiptItem>): number {
-    return this.subtotal(items) + this.taxTotal(items);
+    return this.subtotal(items); 
   }
 
   totalDue(items: Array<ReceiptItem>): number {
-    let total = items
+    const total = items
       .map((item) => item.total)
       .reduce((sum, next) => {
         return sum + next;
       }, 0);
 
-    let totalFixed = Math.round(total * 100) / 100;
+    const totalFixed = Math.round(total * 100) / 100;
 
     return totalFixed;
   }

@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { DbService } from '../../core/services/db/db.service';
 import { PosService } from '../../core/services/pos/pos.service';
-import { SqlQueries } from '../../models/queries';
 
 @Component({
   selector: 'app-report-page',
@@ -86,7 +85,7 @@ LIMIT 20;`,
       description: item.description ?? item.small ?? '',
       options: ['Close'],
       inputParams: this._dbService.execSql(item.sql),
-      onOptionClick: function (option: string, data: any): void {
+      onOptionClick: function (): void {
         //throw new Error('Function not implemented.');
       },
       dismissable: false,

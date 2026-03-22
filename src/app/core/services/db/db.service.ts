@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Database, Statement } from 'better-sqlite3';
+import { Database } from 'better-sqlite3';
 import { DB_SCHEMA } from './schema';
 import {
   ReceiptItem,
@@ -35,7 +35,7 @@ export class DbService {
 
     const DB = window.require('better-sqlite3');
     const ipcRenderer = window.require('electron').ipcRenderer;
-    let appPath = ipcRenderer.sendSync('get-userdata-path');
+    const appPath: string = ipcRenderer.sendSync('get-userdata-path');
     console.log(appPath);
     const dbPath = path.join(appPath, 'UserData.db');
     this.db = new DB(dbPath);
@@ -60,11 +60,11 @@ export class DbService {
       .run();
 
     // Add main menu ID=1
-    let gridResult = this.db
+    const gridResult = this.db
       .prepare('INSERT OR IGNORE INTO GridMenu (GridMenuID) VALUES (1)')
       .run();
 
-    let firstTimeRunning = gridResult.changes == 0 ? false : true;
+    const firstTimeRunning = gridResult.changes == 0 ? false : true;
     /*
       A normal transaction should add up to zero. Since the receipt
       takes the perspective of the customer, our loss-in-value departments
@@ -85,7 +85,7 @@ export class DbService {
 
     // Reserve system products (e.g. Pay In, Pay Out, Change)
 
-    let systemProducts = [
+    const systemProducts = [
       { id: ReservedProductId.ProductNotFound, title: '(Not Found)' },
       { id: ReservedProductId.CashPayment, title: 'Cash' },
       { id: ReservedProductId.CashPaymentChange, title: 'Change' },
@@ -94,13 +94,13 @@ export class DbService {
       { id: ReservedProductId.CashboxAdjustment, title: 'Cashbox Adjustment' },
     ];
 
-    let insert = this.db.prepare(
+    const insert = this.db.prepare(
       'INSERT OR IGNORE INTO Product (ProductID, Title, Price) VALUES (?, ?, ?)',
     );
 
-    let insertProducts = this.db.transaction(() => {
+    const insertProducts = this.db.transaction(() => {
       for (let i = 0; i <= 100; i++) {
-        let name = systemProducts.find((p) => p.id === i) ?? {
+        const name = systemProducts.find((p) => p.id as number === i) ?? {
           id: i,
           title: 'SYS PROD ' + i,
         };
@@ -114,8 +114,8 @@ export class DbService {
     if (!firstTimeRunning) return;
 
     // Add an initial Pay In transaction to allow cashbox total
-    let transId = this.createNewTransaction(1);
-    let initialTransaction: ReceiptItemParams = {
+    const transId = this.createNewTransaction(1);
+    const initialTransaction: ReceiptItemParams = {
       productId: ReservedProductId.CashboxAdjustment,
       productTitle: 'Initialize Cashbox',
       quantity: 1,
@@ -125,29 +125,12 @@ export class DbService {
     this.endTransaction(transId, false);
   }
 
-  /**
-   * @deprecated
-   * @param original Original object
-   * @param patch List of key-value patches to apply to object
-   * @returns Original object with patched values
-   */
-  private patch(original: any, patch: any): any {
-    let patchKeys = Object.keys(patch);
-    for (let patchKey of patchKeys) {
-      // TODO: Check that key exists
-      // TODO: Type this method's inputs and outputs
-      original[patchKey] = patch[patchKey];
-    }
-
-    return original;
-  }
-
   execSql(sql: string): { header: Array<string>; data: Array<Array<string>> } {
     const stmt = this.db.prepare(sql);
     const rows = stmt.all() as Array<any>;
 
     // Get column names from the statement
-    const header = stmt.columns().map((col: any) => col.name);
+    const header = stmt.columns().map((col) => col.name);
 
     // Convert rows to array of arrays of strings
     const data = rows.map((row) =>
@@ -167,10 +150,10 @@ export class DbService {
     where: string,
     patches: Record<string, any>,
   ): void {
-    let patchKeys = Object.keys(patches);
+    const patchKeys = Object.keys(patches);
     let changeCount = 0;
-    for (let patchKey of patchKeys) {
-      let result = this.db
+    for (const patchKey of patchKeys) {
+      const result = this.db
         .prepare(
           `UPDATE ${table} SET ${patchKey} = @PatchValue WHERE ${where};`,
         )
@@ -195,7 +178,7 @@ export class DbService {
   getGridItems(id: number): Array<DbGridMenuButton> {
     console.log('Ran get Grid Layout');
 
-    var items = this.db
+    const items = this.db
       .prepare('SELECT * FROM GridMenuButton b WHERE b.GridMenuID = ?')
       .all(id) as Array<DbGridMenuButton>;
     console.log(items);
@@ -204,7 +187,7 @@ export class DbService {
   }
 
   getParentOfGridMenuId(selectedGridMenuId: number): number {
-    var gridMenu = this.db
+    const gridMenu = this.db
       .prepare('SELECT * FROM GridMenu WHERE GridMenuID = @GridMenuID')
       .get({ GridMenuID: selectedGridMenuId }) as {
       ParentGridMenuID: number;
@@ -218,7 +201,7 @@ export class DbService {
    * @returns Created GridMenuID
    */
   createGridMenu(parentGridMenuId: number): number {
-    let result = this.db
+    const result = this.db
       .prepare(
         `
       INSERT INTO GridMenu (ParentGridMenuID) VALUES (@ParentGridMenuID);
@@ -242,7 +225,7 @@ export class DbService {
    */
   createGridMenuButton(obj: DbGridMenuButton): number {
     // Ensure that one does not conflict
-    let conflict = this.db
+    const conflict = this.db
       .prepare(
         `
       SELECT GridMenuButtonID as id FROM GridMenuButton
@@ -266,7 +249,7 @@ export class DbService {
 
     // Create the item.
 
-    let result = this.db
+    const result = this.db
       .prepare(
         `
       INSERT INTO GridMenuButton
@@ -288,7 +271,7 @@ export class DbService {
       productId: number | null;
     },
   ) {
-    let result = this.db
+    const result = this.db
       .prepare(
         `UPDATE "GridMenuButton"
         SET Label = ?,
@@ -308,7 +291,7 @@ export class DbService {
     gridMenuButtonId: number,
     submenuGridMenuId: number | null,
   ) {
-    let result = this.db
+    const result = this.db
       .prepare(
         `DELETE FROM GridMenuButton WHERE GridMenuButtonID = @GridMenuButtonID`,
       )
@@ -318,7 +301,7 @@ export class DbService {
 
     // If it has a submenu, delete it
     if (submenuGridMenuId) {
-      let submenuResult = this.db
+      const submenuResult = this.db
         .prepare(`DELETE FROM GridMenu WHERE GridMenuID = @GridMenuID`)
         .run({
           GridMenuID: submenuGridMenuId,
@@ -348,7 +331,7 @@ export class DbService {
    * @returns Newly created ProductID
    */
   createProduct(title: string, price: number): number {
-    let result = this.db
+    const result = this.db
       .prepare(`INSERT INTO Product (Title, Price) VALUES (@Title, @Price)`)
       .run({
         Title: title,
@@ -372,7 +355,7 @@ export class DbService {
   }
 
   getAllProductsInGroup(productGroupId: number | undefined): Array<DbProduct> {
-    let products = this.getAllProducts();
+    const products = this.getAllProducts();
     if (productGroupId) {
       return products.filter((item) => item.ProductGroupID == productGroupId);
     } else {
@@ -388,7 +371,7 @@ export class DbService {
 
   getProductGroupTitle(productGroupId: number | null) {
     if (!productGroupId) return null;
-    var productGroup = this.db
+    const productGroup = this.db
       .prepare(
         'SELECT Title FROM ProductGroup WHERE ProductGroupID = @ProductGroupID',
       )
@@ -413,7 +396,7 @@ export class DbService {
    */
   getProduct(id: number): DbProduct | undefined {
     // Try to find product
-    let product = this.db
+    const product = this.db
       .prepare('SELECT * FROM Product p WHERE p.ProductID = ?')
       .get(id) as DbProduct | undefined;
 
@@ -437,14 +420,14 @@ export class DbService {
    * @returns TransactionID of the newly created transaction.
    */
   createNewTransaction(clerkId: number): number {
-    let timeStarted = new Date().toISOString();
+    const timeStarted = new Date().toISOString();
 
-    let transaction = {
+    const transaction = {
       ClerkID: clerkId,
       TimeStarted: timeStarted,
     };
 
-    let result = this.db
+    const result = this.db
       .prepare(`INSERT INTO "Transaction" (ClerkID, TimeStarted) VALUES (?, ?)`)
       .run(transaction.ClerkID, transaction.TimeStarted);
 
@@ -466,24 +449,32 @@ export class DbService {
       });
   }
 
+  listSavedTransactions(): Array<DbTransaction> {
+    return this.db
+      .prepare(
+        'SELECT * FROM `Transaction` WHERE IsVoided != 1 AND TimeEnded IS NULL ORDER BY TransactionID DESC',
+      )
+      .all() as Array<DbTransaction>;
+  }
+
   listRecentTransactions(): Array<DbTransaction> {
     return this.db
       .prepare(
-        'SELECT * FROM `Transaction` WHERE IsVoided != 1 ORDER BY TimeEnded DESC',
+        'SELECT * FROM `Transaction` WHERE IsVoided != 1 AND TimeEnded IS NOT NULL ORDER BY TimeEnded DESC',
       )
       .all() as Array<DbTransaction>;
   }
 
   endTransaction(transactionId: number, isVoid: boolean) {
-    let timeEnded = new Date().toISOString();
+    const timeEnded = new Date().toISOString();
 
-    let obj = {
+    const obj = {
       TimeEnded: timeEnded,
       IsVoided: isVoid ? 1 : 0,
       TransactionID: transactionId,
     };
 
-    let result = this.db
+    const result = this.db
       .prepare(
         `
         UPDATE "Transaction"
@@ -510,9 +501,9 @@ export class DbService {
    * @returns Id of new TransactionDetail.
    */
   addTransactionDetail(item: ReceiptItem, transactionId: number): number {
-    let itemJson = item.json;
+    const itemJson = item.json;
 
-    let result = this.db
+    const result = this.db
       .prepare(
         `INSERT INTO "TransactionDetail" (TransactionID, ProductID, ProductTitle, Quantity, UnitPrice, IsUnitPriceOverriden) VALUES (?, ?, ?, ?, ?, ?)`,
       )

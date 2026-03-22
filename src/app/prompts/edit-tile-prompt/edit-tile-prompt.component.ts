@@ -36,7 +36,7 @@ export class EditTilePromptComponent extends BasePrompt {
   public setParams(params: TriggerPromptParams): void {
     super.setParams(params);
 
-    let btn: DbGridMenuButton = this.inputParams.gridMenuButton;
+    const btn: DbGridMenuButton = this.inputParams.gridMenuButton;
     this.label = btn.Label ?? '<BLANK>';
   }
 

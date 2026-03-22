@@ -6,7 +6,6 @@ import {
 } from '../../core/services/pos/pos.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DbGridMenuButton } from '../../models/db/product';
 
 @Component({
   selector: 'app-product-tile-prompt',

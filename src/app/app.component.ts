@@ -1,24 +1,17 @@
 import {
   Component,
-  computed,
-  CUSTOM_ELEMENTS_SCHEMA,
   OnDestroy,
-  OnInit,
-  Signal,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import { ReceiptComponent } from './receipt/receipt.component';
 import { CommonModule } from '@angular/common';
 import { ReceiptItem } from './models/receipt-item.model';
-import { BasicPromptComponent } from './prompts/basic-prompt/basic-prompt.component';
 import { PosService } from './core/services/pos/pos.service';
-import { PresetGridComponent } from './preset-area/preset-grid/preset-grid.component';
 import { DbService } from './core/services/db/db.service';
 import { PromptFactory } from './core/factories/prompt-factory';
 import { TransactionService } from './core/services/transaction/transaction.service';
 import {
-  DbGridMenuButton,
   DbProduct,
   DbTransaction,
   ReservedProductId,
@@ -50,7 +43,7 @@ import { APP_CONFIG } from '../environments/environment';
   styleUrls: ['./app.component.scss'],
   standalone: true,
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnDestroy {
   @ViewChild(ReceiptComponent) receiptViewer!: ReceiptComponent;
   @ViewChild('promptHost', { read: ViewContainerRef, static: true })
   promptHost!: ViewContainerRef;
@@ -115,7 +108,7 @@ export class AppComponent implements OnInit, OnDestroy {
       }
 
       // If not null, create the next prompt for display
-      let component = PromptFactory.createPromptComponent(params.type);
+      const component = PromptFactory.createPromptComponent(params.type);
       const componentRef = this.promptHost.createComponent(component);
       componentRef.instance.setParams(params);
 
@@ -127,8 +120,6 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed())
       .subscribe((product) => this.onItemAdded(product));
   }
-  /** Performs on initialization */
-  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this._posService.promptHandled();
@@ -220,6 +211,38 @@ export class AppComponent implements OnInit, OnDestroy {
     this.closePayment(true);
   }
 
+  // A transaction without a TimeEnded is considered a Saved Transaction.
+  // There may be alternative names for "Saved Transaction".
+  onSaveTransaction() {
+    // Simply set currentTransactionId to null.
+    this.closePayment(false, true);
+  }
+
+  // "Click to Resume/Recall #XXX" could appear
+  //
+  onRecallTransaction() {
+    // Display a list of Saved Transactions, similar to Previous Receipts menu.
+    // Will display corresponding receipt on left when it is highlighted.
+    // 1:
+    // 2:
+    // ...
+    // [Cancel, Resume]
+
+    this._posService.triggerPrompt({
+      type: 'list',
+      title: 'Unfinished Transactions',
+      description: 'Press a transaction to view or resume',
+      options: ['Cancel', 'Resume'],
+      inputParams: {
+        list: this._dbService.listRecentTransactions(),
+      },
+      onOptionClick: function (): void {
+        throw new Error('Function not implemented.');
+      },
+      dismissable: false,
+    });
+  }
+
   onCashbox() {
     // List prompt
     // options: Pay In, Pay Out, Count Drawer
@@ -296,10 +319,10 @@ export class AppComponent implements OnInit, OnDestroy {
             onOptionClick: (option: string, data: any) => {
               if (option == 'Cancel') return;
 
-              let registeredAmt = this._dbService.getCashboxAmount();
-              let countedAmt = data.amount;
+              const registeredAmt = this._dbService.getCashboxAmount();
+              const countedAmt = data.amount;
 
-              let adjustment = registeredAmt - countedAmt;
+              const adjustment = registeredAmt - countedAmt;
               if (adjustment < 0) {
                 // Over (positive adjustment = money out)
               } else if (adjustment > 0) {
@@ -335,11 +358,20 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this._posService.triggerPrompt({
       type: 'list',
-      title: 'Previous Receipts',
+      title: 'Previous Transactions',
       description: 'Click a transaction to display',
       inputParams: {
-        items: this._dbService.listRecentTransactions(),
-        map: (item: DbTransaction) => new Date(item.TimeEnded).toLocaleString(),
+        items: [
+          ...this._dbService.listSavedTransactions(),
+          ...this._dbService.listRecentTransactions(),
+        ],
+        map: (item: DbTransaction) => {
+          if (item.TimeEnded) {
+            return `#${item.TransactionID} (${new Date(item.TimeEnded).toLocaleString()})`;
+          } else {
+            return `#${item.TransactionID} (Saved for Recall)`;
+          }
+        },
         onFocus: (item: DbTransaction) => {
           this.currentTransactionId = item.TransactionID;
           this.items = this._transactionService.rebuildReceiptItems(
@@ -349,8 +381,28 @@ export class AppComponent implements OnInit, OnDestroy {
           this.receiptViewer.memo = item.Memo;
         },
       },
-      options: ['Close'],
-      onOptionClick: (option: string, data: any): void => {
+      options: ['Close', 'Recall'],
+      onOptionClick: (
+        option: string,
+        data: { itemSelection: DbTransaction },
+      ): void => {
+        if (option == 'Recall') {
+          if (!data.itemSelection.TimeEnded) {
+            return;
+          } else {
+            this._posService.triggerPrompt({
+              type: 'basic',
+              title: 'Transaction Not Recallable',
+              description: 'Only unfinished transactions can be recalled. You will now be returned home.',
+              options: ['OK'],
+              onOptionClick: function (): void {
+                // Empty
+              },
+              dismissable: false,
+            });
+          }
+        }
+
         this.currentTransactionId = null;
         this.selectedItemIndex = null;
         this.receiptViewer.memo = '';
@@ -372,25 +424,53 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     this._posService.triggerPrompt({
-      type: 'keyboard',
-      title: 'Attach Memo',
-      description: 'What is your message?',
-      options: ['Cancel', 'Save'],
+      type: 'list',
+      title: 'Manage Transaction',
+      description: '',
+      options: ['Cancel', 'OK'],
       inputParams: {
-        startingInputValue: this.receiptViewer.memo,
-        onEnterOption: 'Save'
+        items: ['Save for Recall', 'Attach Memo'],
+        map: (item: string) => item,
       },
-      onOptionClick: (option: string, data: { inputValue: string }): void => {
-        if (option == 'Cancel') return;
-        this._dbService.updateTransactionMemo(
-          this.currentTransactionId!,
-          data.inputValue,
-        );
-        this.receiptViewer.memo = data.inputValue;
-
-        //throw new Error('Function not implemented.');
+      onOptionClick: (
+        option: string,
+        data: { itemSelection: string },
+      ): void => {
+        if (data.itemSelection == 'Save for Recall') {
+          /*
+          An empty transaction could be recalled if a
+          previous clerk wants to leave a memo for a future clerk,
+          aka "Please credit the customer of this transaction $5, because
+          they left it on the counter yesterday. They will tell you this
+          transaction number to recall to use their store credit."
+          */
+          this.onSaveTransaction();
+        } else if (data.itemSelection == 'Attach Memo') {
+          this._posService.triggerPrompt({
+            type: 'keyboard',
+            title: 'Attach Memo',
+            description: 'What is your message?',
+            options: ['Cancel', 'Save'],
+            inputParams: {
+              startingInputValue: this.receiptViewer.memo,
+              onEnterOption: 'Save',
+            },
+            onOptionClick: (
+              option: string,
+              data: { inputValue: string },
+            ): void => {
+              if (option == 'Cancel') return;
+              this._dbService.updateTransactionMemo(
+                this.currentTransactionId!,
+                data.inputValue,
+              );
+              this.receiptViewer.memo = data.inputValue;
+            },
+            dismissable: false,
+          });
+        }
       },
-      dismissable: false,
+      dismissable: true,
     });
   }
 
@@ -409,7 +489,7 @@ export class AppComponent implements OnInit, OnDestroy {
       options: ['Cancel', 'Enter'],
       dismissable: true,
       onOptionClick: (btnLbl, data) => {
-        let numericData = data as { amount: number };
+        const numericData = data as { amount: number };
 
         if (btnLbl == 'Enter' && this.hasSelectedItem) {
           this.selectedItem!.quantity = numericData.amount;
@@ -441,7 +521,7 @@ export class AppComponent implements OnInit, OnDestroy {
       options: ['Cancel', 'Enter'],
       dismissable: true,
       onOptionClick: (btnLbl, data) => {
-        let numericData = data as { amount: number };
+        const numericData = data as { amount: number };
         if (btnLbl == 'Enter' && this.hasSelectedItem) {
           this.selectedItem!.unitPrice = numericData.amount;
         }
@@ -456,7 +536,7 @@ export class AppComponent implements OnInit, OnDestroy {
     ) {
       return;
     }
-    this._router.navigate([url]);
+    void this._router.navigate([url]);
   }
 
   onSafeDrop() {
@@ -486,7 +566,7 @@ export class AppComponent implements OnInit, OnDestroy {
       dismissable: true,
       onOptionClick: (btnLbl, data: { amount: number; preset?: string }) => {
         let amount = data.amount;
-        let totalDue = this._transactionService.totalDue(this.items);
+        const totalDue = this._transactionService.totalDue(this.items);
         if (data.preset) {
           switch (data.preset) {
             case 'Exact Dollar':
@@ -515,7 +595,7 @@ export class AppComponent implements OnInit, OnDestroy {
   handleCashPayment(amountReceived: number) {
     //alert(`Cash payment of ${amountReceived} received.`);
 
-    let totalDue = this._transactionService.totalDue(this.items);
+    const totalDue = this._transactionService.totalDue(this.items);
 
     // Create cashpayment TransactionDetail
     this.items.push(
@@ -532,7 +612,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // Create change TransactionDetail
-    let changeAmount = amountReceived - totalDue;
+    const changeAmount = amountReceived - totalDue;
     if (changeAmount < 0)
       throw new Error('Change amount should be positive or 0.');
     this.items.push(
@@ -557,7 +637,7 @@ export class AppComponent implements OnInit, OnDestroy {
       type: 'numeric',
       options: ['Cancel', 'Enter'],
       onOptionClick: function (btnLbl, data) {
-        let numericData = data as { amount: number };
+        const numericData = data as { amount: number };
         if (btnLbl == 'Enter') {
           alert(numericData.amount);
         }
@@ -570,18 +650,22 @@ export class AppComponent implements OnInit, OnDestroy {
    * database, and resets.
    *
    * @param [isVoid=false] Voided transaction?
+   * @param [isSavedForLater=false] Tranasactions saved for Recall later
+   * do not have an TimeEnded marked via endTranasction.
    */
-  closePayment(isVoid: boolean = false) {
+  closePayment(isVoid: boolean = false, isSavedForLater: boolean = false) {
     if (!this.currentTransactionId) {
       return;
     }
 
     // Add line items
-    for (let item of this.items) {
+    for (const item of this.items) {
       this._dbService.addTransactionDetail(item, this.currentTransactionId);
     }
 
-    this._dbService.endTransaction(this.currentTransactionId, isVoid);
+    if (!isSavedForLater) {
+      this._dbService.endTransaction(this.currentTransactionId, isVoid);
+    }
 
     this.currentTransactionId = null;
 

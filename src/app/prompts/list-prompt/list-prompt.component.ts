@@ -25,11 +25,11 @@ export class ListPromptComponent extends BasePrompt {
     onFocus?: (item: any) => void;
   };
 
-  selection: any | undefined;
+  selection: any;
 
   constructor(private _posService: PosService) {
     super();
-    this.inputParams = { items: [], map: (item) => 'N/A' }; // Until params are set
+    this.inputParams = { items: [], map: () => 'N/A' }; // Until params are set
 
     // const testParams: TriggerPromptParams = {
     //   title: "My Title",
@@ -61,7 +61,7 @@ export class ListPromptComponent extends BasePrompt {
   }
 
   protected override onOptionClicked(option: string): void {
-    let data = {
+    const data = {
       listItemSelection: this.inputParams.map(this.selection),
       itemSelection: this.selection,
     };

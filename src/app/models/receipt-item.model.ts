@@ -1,4 +1,3 @@
-import { DbService } from '../core/services/db/db.service';
 import { ReservedProductId } from './db/product';
 
 export interface ReceiptItemParams {

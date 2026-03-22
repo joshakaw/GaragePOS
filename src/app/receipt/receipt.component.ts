@@ -1,18 +1,15 @@
 import {
   Component,
-  computed,
   ElementRef,
   EventEmitter,
   Input,
-  input,
   OnChanges,
   Output,
-  Signal,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { ReceiptItem } from '../models/receipt-item.model';
-import { CommonModule, NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { TransactionService } from '../core/services/transaction/transaction.service';
 import { ReservedProductId } from '../models/db/product';
 
@@ -29,14 +26,14 @@ export class ReceiptComponent implements OnChanges {
 
   /** The transaction number to display with the receipt */
   @Input() transactionReferenceNumber!: number | null;
-  @Output() onClickItemIndex = new EventEmitter<number>();
+  @Output() clickItemIndex = new EventEmitter<number>();
   @ViewChild('highlightBar') highlightBar!: ElementRef;
 
   public memo : string = '';
 
   changeAmount(): number {
-    let item = this.receiptItemList.find(
-      (item) => item.productId == ReservedProductId.CashPaymentChange,
+    const item = this.receiptItemList.find(
+      (item) => item.productId == ReservedProductId.CashPaymentChange as number,
     );
     if (item) {
       return item.total;
@@ -66,20 +63,20 @@ export class ReceiptComponent implements OnChanges {
   }
 
   public onClickItem(index: number) {
-    this.onClickItemIndex.emit(index);
+    this.clickItemIndex.emit(index);
   }
 
   private updateHighlightBarPosition() {
-    let index = this.selectedItemIndex;
+    const index = this.selectedItemIndex;
 
     requestAnimationFrame(() => {
       const rows = document.querySelectorAll(
         '.receipt-table tbody tr',
-      ) as NodeListOf<HTMLElement>;
+      );
       const rowOffset = index
         ? {
-            offsetTop: rows[index].offsetTop,
-            offsetHeight: rows[index].offsetHeight,
+            offsetTop: (rows[index] as HTMLElement).offsetTop,
+            offsetHeight: (rows[index] as HTMLElement).offsetHeight,
           }
         : { offsetTop: 0, offsetHeight: 40 };
       const bar = this.highlightBar?.nativeElement as HTMLElement;

@@ -47,7 +47,7 @@ export class ProductPageComponent {
       inputParams: {
         items: [
           { action: 'Title', current: `${product.Title}` },
-          { action: 'Price', current: `\$${product.Price.toFixed(2)}` },
+          { action: 'Price', current: `${product.Price.toFixed(2)}` },
           {
             action: 'Group',
             current: `${this._dbService.getProductGroupTitle(product.ProductGroupID) ?? '(None)'}`,
@@ -174,7 +174,7 @@ export class ProductPageComponent {
       onOptionClick: (option: string, data: { inputValue: string }): void => {
         if (option == 'Cancel') return;
 
-        let title = data.inputValue;
+        const title = data.inputValue;
         this._posService.triggerPrompt({
           type: 'numeric',
           title: 'Create a New Product',
@@ -182,9 +182,9 @@ export class ProductPageComponent {
           options: ['Cancel', 'Create Product'],
           onOptionClick: (option: string, data: { amount: number }): void => {
             if (option == 'Cancel') return;
-            let price = data.amount;
+            const price = data.amount;
 
-            let id = this._dbService.createProduct(title, price);
+            this._dbService.createProduct(title, price);
             this.refreshProducts();
           },
           dismissable: false,

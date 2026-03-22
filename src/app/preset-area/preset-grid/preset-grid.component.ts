@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { PresetGridButtonComponent } from '../preset-grid-button/preset-grid-button.component';
 import { CommonModule } from '@angular/common';
 import { DbService } from '../../core/services/db/db.service';
 import { PosService } from '../../core/services/pos/pos.service';
@@ -63,12 +62,12 @@ export class PresetGridComponent implements OnInit {
 
     this.gridItems = this.createBlankGridItemArray(7, 5);
     // Get menu
-    let dbGrid = this._dbService.getGridItems(this.selectedGridMenuId);
+    const dbGrid = this._dbService.getGridItems(this.selectedGridMenuId);
 
     // Populate the grid from DB.
     for (let i = 0; i < this.gridItems.length; i++) {
-      let pos: { x: number; y: number } = this.getXYFromIndex(i);
-      let gridItem = dbGrid.find((obj) => obj.X == pos.x && obj.Y == pos.y);
+      const pos: { x: number; y: number } = this.getXYFromIndex(i);
+      const gridItem = dbGrid.find((obj) => obj.X == pos.x && obj.Y == pos.y);
       if (typeof gridItem != 'undefined') {
         this.gridItems[i] = gridItem;
       } else {
@@ -85,10 +84,10 @@ export class PresetGridComponent implements OnInit {
    * @param height Y Size
    */
   private createBlankGridItemArray(width: number, height: number) {
-    let tempGridItemsArray: DbGridMenuButton[] = [];
+    const tempGridItemsArray: DbGridMenuButton[] = [];
     for (let y = 1; y <= height; y++) {
       for (let x = 1; x <= width; x++) {
-        let a: DbGridMenuButton = {
+        const a: DbGridMenuButton = {
           X: x,
           Y: y,
           GridMenuButtonID: -1, // Unknown ID
@@ -115,8 +114,8 @@ export class PresetGridComponent implements OnInit {
    * @returns X, Y coordinates (1-based) of grid items
    */
   private getXYFromIndex(index: number): { x: number; y: number } {
-    let x = (index % this.width) + 1;
-    let y = Math.floor(index / this.width) + 1;
+    const x = (index % this.width) + 1;
+    const y = Math.floor(index / this.width) + 1;
     return { x, y };
   }
 
@@ -131,7 +130,7 @@ export class PresetGridComponent implements OnInit {
     }
     if (item.OnClick_AddProductID) {
       // Get Product
-      let product = this._dbService.getProduct(item.OnClick_AddProductID);
+      const product = this._dbService.getProduct(item.OnClick_AddProductID);
       // Fire event
       if (product) {
         this._posService.addItem(product);
@@ -144,6 +143,7 @@ export class PresetGridComponent implements OnInit {
       this.selectedGridMenuId = item.OnClick_OpenGridMenuID;
       this.refreshGridItems();
     } else if (item.OnClick_Script != null) {
+      //Empty
     }
   }
 
@@ -166,7 +166,7 @@ export class PresetGridComponent implements OnInit {
               title: 'Confirm',
               description: 'Are you sure?',
               options: ['Yes', 'No'],
-              onOptionClick: (option, data) => {
+              onOptionClick: (option) => {
                 if (option == 'Yes') {
                   this._dbService.deleteGridMenuButton(
                     item.GridMenuButtonID,
@@ -190,7 +190,9 @@ export class PresetGridComponent implements OnInit {
         dismissable: false,
       });
     } else if (item.OnClick_OpenGridMenuID) {
+      //Empty
     } else if (item.OnClick_Script) {
+      //Empty
     } else {
       // Blank tile
       this._posService.triggerPrompt({
@@ -199,9 +201,9 @@ export class PresetGridComponent implements OnInit {
         type: 'basic',
         options: ['Cancel', 'Add Product', 'Open Submenu'],
         dismissable: true,
-        onOptionClick: (btnLbl, data) => {
+        onOptionClick: (btnLbl) => {
           if (btnLbl == 'Add Product') {
-            let allProducts = this._dbService
+            const allProducts = this._dbService
               .getAllProducts()
               .map((item) => item.Title);
 
@@ -244,7 +246,11 @@ export class PresetGridComponent implements OnInit {
               options: ['Cancel', 'Enter'],
               onOptionClick: (option: string, data: any): void => {
                 if (option == 'Enter') {
-                  this.createSubmenuAndOpen(item, index, data.inputValue);
+                  this.createSubmenuAndOpen(
+                    item,
+                    index,
+                    data.inputValue as string,
+                  );
                 }
               },
               dismissable: true,
@@ -265,7 +271,7 @@ export class PresetGridComponent implements OnInit {
   ) {
     if (item.GridMenuButtonID == -1) {
       // Create gridmenu
-      let newGridMenuId = this._dbService.createGridMenu(
+      const newGridMenuId = this._dbService.createGridMenu(
         this.selectedGridMenuId,
       );
 
@@ -305,7 +311,8 @@ export class PresetGridComponent implements OnInit {
     index: number,
     productName: string,
   ) {
-    let productInfo: DbProduct = this._dbService.getProductByName(productName);
+    const productInfo: DbProduct =
+      this._dbService.getProductByName(productName);
     if (item.GridMenuButtonID == -1) {
       try {
         this._dbService.createGridMenuButton({
@@ -331,6 +338,4 @@ export class PresetGridComponent implements OnInit {
 
     this.refreshGridItems();
   }
-
-  runScriptInSandbox(command: string) {}
 }
