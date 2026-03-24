@@ -39,7 +39,7 @@
                 </div>
             </div> -->
             <app-receipt [receiptItemList]="items" [selectedItemIndex]="selectedItemIndex"
-                [transactionReferenceNumber]="currentTransactionId" (onClickItemIndex)="selectedItemIndex = $event"
+                [transactionReferenceNumber]="currentTransactionId" (clickItemIndex)="selectedItemIndex = $event"
                 style="flex-grow: 1" />
             <div style="display: flex; flex: none;height:80px;">
                 <button class="footer-button footer-button-border-right" [disabled]="!isActiveTransaction">
