@@ -100,7 +100,7 @@ export class DbService {
 
     const insertProducts = this.db.transaction(() => {
       for (let i = 0; i <= 100; i++) {
-        const name = systemProducts.find((p) => p.id as number === i) ?? {
+        const name = systemProducts.find((p) => (p.id as number) === i) ?? {
           id: i,
           title: 'SYS PROD ' + i,
         };
@@ -517,6 +517,31 @@ export class DbService {
       );
 
     return result.lastInsertRowid as number;
+  }
+
+  /**
+   * Deletes all TransactionDetail records 
+   * from a given TransactionID.
+   */
+  clearTransactionDetails(transactionId: number) {
+    const results = this.db
+      .prepare(
+        `
+      DELETE FROM "TransactionDetail"
+      WHERE TransactionID = @TransactionID
+      `,
+      )
+      .run({
+        TransactionID: transactionId,
+      });
+
+    if (results.changes > 0) {
+      this.logger.info(
+        `${results.changes} TransactionDetail records ` +
+          `removed from TransactionID ${transactionId}.`,
+      );
+    }
+    return;
   }
 
   getTransactionDetailItems(transactionId: number) {

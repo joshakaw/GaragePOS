@@ -393,7 +393,8 @@ export class AppComponent implements OnDestroy {
             this._posService.triggerPrompt({
               type: 'basic',
               title: 'Transaction Not Recallable',
-              description: 'Only unfinished transactions can be recalled. You will now be returned home.',
+              description:
+                'Only unfinished transactions can be recalled. You will now be returned home.',
               options: ['OK'],
               onOptionClick: function (): void {
                 // Empty
@@ -436,6 +437,8 @@ export class AppComponent implements OnDestroy {
         option: string,
         data: { itemSelection: string },
       ): void => {
+        if (option == 'Cancel') return;
+
         if (data.itemSelection == 'Save for Recall') {
           /*
           An empty transaction could be recalled if a
@@ -651,12 +654,16 @@ export class AppComponent implements OnDestroy {
    *
    * @param [isVoid=false] Voided transaction?
    * @param [isSavedForLater=false] Tranasactions saved for Recall later
-   * do not have an TimeEnded marked via endTranasction.
+   * do not have an TimeEnded marked (via endTranasction call).
    */
   closePayment(isVoid: boolean = false, isSavedForLater: boolean = false) {
     if (!this.currentTransactionId) {
       return;
     }
+
+    // Ensure there are no existing TransactionDetails (so that we don't
+    // duplicate line items on a recalled transaction)
+    this._dbService.clearTransactionDetails(this.currentTransactionId);
 
     // Add line items
     for (const item of this.items) {
